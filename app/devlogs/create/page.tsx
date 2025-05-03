@@ -16,6 +16,8 @@ export default function CreateDevlogPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { isLoggedIn } = useUserStore();
+  const { writeDevlog } = useDevlog();
+
   const [formData, setFormData] = useState({
     title: "",
     date: new Date(),
@@ -23,29 +25,27 @@ export default function CreateDevlogPage() {
     content: "",
     category: "",
   });
-  const { writeDevlog } = useDevlog();
+
+  const showLoginRequiredMessage = () => {
+    toast({
+      title: "로그인이 필요합니다",
+      description: "개발일지를 작성하려면 로그인해 주세요.",
+      variant: "destructive",
+    });
+    router.push("/login");
+  };
 
   useEffect(() => {
     if (!isLoggedIn) {
-      toast({
-        title: "로그인이 필요합니다",
-        description: "개발일지를 작성하려면 로그인해 주세요.",
-        variant: "destructive",
-      });
-      router.push("/login");
+      showLoginRequiredMessage();
     }
-  }, [isLoggedIn, router, toast]);
+  }, [isLoggedIn]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!isLoggedIn) {
-      toast({
-        title: "로그인이 필요합니다",
-        description: "개발일지를 작성하려면 로그인해 주세요.",
-        variant: "destructive",
-      });
-      router.push("/login");
+      showLoginRequiredMessage();
       return;
     }
 
@@ -59,7 +59,6 @@ export default function CreateDevlogPage() {
     }
 
     try {
-      console.log("Submitting form data:", formData);
       await writeDevlog(formData);
       toast({
         title: "성공",
@@ -98,10 +97,10 @@ export default function CreateDevlogPage() {
                   <SelectValue placeholder="카테고리 선택" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="development">개발</SelectItem>
-                  <SelectItem value="design">디자인</SelectItem>
-                  <SelectItem value="business">비즈니스</SelectItem>
-                  <SelectItem value="other">기타</SelectItem>
+                  <SelectItem value="개발">개발</SelectItem>
+                  <SelectItem value="디자인">디자인</SelectItem>
+                  <SelectItem value="비지니스">비즈니스</SelectItem>
+                  <SelectItem value="기타">기타</SelectItem>
                 </SelectContent>
               </Select>
             </div>

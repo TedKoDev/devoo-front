@@ -1,10 +1,10 @@
 "use client";
-
-import Link from "next/link";
 import { Calendar } from "lucide-react";
+import Link from "next/link";
 import { useDevlog, type Devlog } from "@/lib/hooks/useDevlog";
 import { Button } from "@/components/ui/button";
-
+import ReadingTime from "@/components/utils/ReadingTime";
+import calculateReadingTime from "@/components/utils/calculateReadingTime";
 export default function DevLogsPage() {
   const { devlogs, isLoading, error } = useDevlog();
 
@@ -25,9 +25,11 @@ export default function DevLogsPage() {
           <Link href={`/devlogs/${devlog.id}`} key={devlog.id} className="block">
             <div className="rounded-lg border p-5 hover:shadow-md transition-shadow bg-white">
               <h2 className="text-lg font-semibold">{devlog.title}</h2>
-              <div className="flex items-center text-sm text-gray-500 mt-1">
-                <Calendar className="h-4 w-4 mr-1" />
+              <div className="flex items-center text-sm text-gray-500 mt-1 gap-2">
+                <Calendar className="h-4 w-4" />
                 <span>{new Date(devlog.date).toLocaleDateString("ko-KR")}</span>
+                <span>•</span>
+                <ReadingTime minutes={calculateReadingTime(devlog.content)} />
               </div>
               <p className="text-gray-600 mt-3 line-clamp-2">{devlog.summary}</p>
               <div className="flex mt-4">

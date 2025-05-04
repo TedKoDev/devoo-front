@@ -1,3 +1,14 @@
+// types.ts
+export const TargetTypes = {
+  BLOG_POST: "BLOG_POST",
+  HOT_ISSUE: "HOT_ISSUE",
+  TOOL: "TOOL",
+  SIDE_HUSTLE: "SIDE_HUSTLE",
+  DEV_LOG: "DEV_LOG",
+} as const;
+
+export type TargetType = (typeof TargetTypes)[keyof typeof TargetTypes];
+
 export interface HotIssue {
   id: string;
   title: string;

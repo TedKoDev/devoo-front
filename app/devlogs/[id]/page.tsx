@@ -5,7 +5,9 @@ import { useSingleDevlog } from "@/lib/hooks/useDevlogs";
 import { Calendar, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-
+import CommentSection from "@/components/community/CommentSection";
+import InteractionSection from "@/components/community/InteractionSection";
+import { TargetType, TargetTypes } from "@/types/content";
 export default function DevLogDetailPage(props: { params: Promise<{ id: string }> }) {
   const { id } = use(props.params);
   const parsedId = parseInt(id, 10);
@@ -24,7 +26,6 @@ export default function DevLogDetailPage(props: { params: Promise<{ id: string }
           개발일지 목록으로
         </Button>
       </Link>
-
       <div className="section-card">
         <h1 className="text-2xl font-bold mb-2">{devlog.title}</h1>
         <div className="flex items-center space-x-4 text-sm text-gray-500 mb-6">
@@ -45,6 +46,10 @@ export default function DevLogDetailPage(props: { params: Promise<{ id: string }
 
         <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: devlog.content }}></div>
       </div>
+
+      <InteractionSection target_type={TargetTypes.DEV_LOG} target_id={parsedId} />
+
+      <CommentSection target_type={TargetTypes.DEV_LOG} target_id={parsedId} />
     </div>
   );
 }

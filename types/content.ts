@@ -29,15 +29,22 @@ export interface PopularSideHustle {
   timeRequired: string;
 }
 
-export interface DevLog {
+export interface Devlog {
   id: string;
   title: string;
+  date: Date;
+  summary: string;
   content: string;
-  author: string;
-  date: string;
-  tags: string[];
-  likes: number;
-  comments: number;
+  author: {
+    id: number;
+    username: string;
+  };
+  category: string;
+  interactions: {
+    likes: number;
+    dislikes: number;
+    comments: number;
+  };
 }
 
 export interface ToolRequest {

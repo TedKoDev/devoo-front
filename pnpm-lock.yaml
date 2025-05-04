@@ -158,6 +158,9 @@ importers:
       '@tiptap/starter-kit':
         specifier: ^2.11.9
         version: 2.11.9
+      '@toss/use-overlay':
+        specifier: ^1.4.2
+        version: 1.4.2(react@18.3.1)
       '@types/bcryptjs':
         specifier: ^3.0.0
         version: 3.0.0
@@ -1788,6 +1791,12 @@ packages:
 
   '@tiptap/starter-kit@2.11.9':
     resolution: {integrity: sha512-UUx5t1PrwR+KVOjTkmGC1duOq6Ubz/fsetI1OieyegMT/2J1wkFFP1w3NFZarj5jo0GLBt3GMlBwS9GY8cJUxQ==}
+
+  '@toss/use-overlay@1.4.2':
+    resolution: {integrity: sha512-OYJKSKkldho8qrJR0xMJLpz85H68+E+y6H3y/N0XUed/b0ytbfU+fuxcPd14uiC8H0xzliTGBlY8GQP9Z/lteQ==}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+    peerDependencies:
+      react: ^16.8 || ^17 || ^18
 
   '@types/bcryptjs@3.0.0':
     resolution: {integrity: sha512-WRZOuCuaz8UcZZE4R5HXTco2goQSI2XxjGY3hbM/xDvwmqFWd4ivooImsMx65OKM6CtNKbnZ5YL+YwAwK7c1dg==}
@@ -4880,6 +4889,10 @@ snapshots:
       '@tiptap/extension-text': 2.11.9(@tiptap/core@2.11.9(@tiptap/pm@2.11.9))
       '@tiptap/extension-text-style': 2.11.9(@tiptap/core@2.11.9(@tiptap/pm@2.11.9))
       '@tiptap/pm': 2.11.9
+
+  '@toss/use-overlay@1.4.2(react@18.3.1)':
+    dependencies:
+      react: 18.3.1
 
   '@types/bcryptjs@3.0.0':
     dependencies:

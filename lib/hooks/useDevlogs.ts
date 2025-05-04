@@ -9,7 +9,16 @@ export interface Devlog {
   date: Date;
   summary: string;
   content: string;
+  author: {
+    id: number;
+    username: string;
+  };
   category: string;
+  interactions: {
+    likes: number;
+    dislikes: number;
+    comments: number;
+  };
 }
 
 export function useDevlog() {
@@ -126,5 +135,33 @@ export function useDevlog() {
     deleteDevlog: deleteDevlogMutation.mutateAsync,
     isLoading: writeDevlogMutation.isPending || getDevlogs.isPending || updateDevlogMutation.isPending || deleteDevlogMutation.isPending,
     error: getDevlogs.error,
+  };
+}
+// 단일 게시글 조회 query
+export function useSingleDevlog(id: string) {
+  const { token } = useUserStore();
+
+  const getSingleDevlog = useQuery({
+    queryKey: ["devlog", id],
+    queryFn: async () => {
+      const response = await fetch(`/api/devlogs/${id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "개발일지 조회에 실패했습니다.");
+      }
+
+      return response.json();
+    },
+  });
+  return {
+    devlog: getSingleDevlog.data,
+    isLoading: getSingleDevlog.isPending,
+    error: getSingleDevlog.error,
   };
 }

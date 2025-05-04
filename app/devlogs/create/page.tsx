@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import TiptapEditor from "@/components/editor/TiptapEditor";
-import { useDevlog } from "@/lib/hooks/useDevlog";
+import { useDevlog } from "@/lib/hooks/useDevlogs";
 import { useToast } from "@/hooks/use-toast";
 import { useUserStore } from "@/store/useUserStore";
 

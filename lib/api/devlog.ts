@@ -32,4 +32,6 @@ export const devlogApi = {
   updateDevlog: (id: string, data: DevlogRequest): Promise<DevlogResponse> => apiClient.put<DevlogResponse>(`/dev-logs/${id}`, data),
 
   deleteDevlog: (id: string): Promise<void> => apiClient.delete(`/dev-logs/${id}`),
+
+  getDevlogById: (id: number): Promise<DevlogResponse> => apiClient.get<DevlogResponse>(`/dev-logs/${id}`),
 };

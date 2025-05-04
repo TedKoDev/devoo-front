@@ -9,10 +9,36 @@ import { Button } from "@/components/ui/button";
 import { useAllMarketData } from "@/hooks/use-market-data";
 import { useAllContent } from "@/hooks/use-content";
 import { useToast } from "@/hooks/use-toast";
+import { useOverlay } from "@toss/use-overlay";
+import { ConfirmDialog } from "@/components/ads/Confirmdialog";
 
 export default function Home() {
   const { toast } = useToast();
+  const overlay = useOverlay();
 
+  const handleOpenDialog = async () => {
+    const confirmed = await new Promise<boolean>((resolve) => {
+      overlay.open(({ isOpen, close }) => (
+        <ConfirmDialog
+          open={isOpen}
+          onClose={() => {
+            resolve(false);
+            close();
+          }}
+          onConfirm={() => {
+            resolve(true);
+            close();
+          }}
+        />
+      ));
+    });
+
+    if (confirmed) {
+      alert("사용자가 확인을 눌렀습니다.");
+    } else {
+      alert("사용자가 취소를 눌렀습니다.");
+    }
+  };
   // React Query를 사용하여 데이터 가져오기
   const {
     searchTrends,
@@ -76,6 +102,7 @@ export default function Home() {
 
       <div className="mt-12">
         <Suspense fallback={<SectionSkeleton />}>
+          {/* <Button onClick={handleOpenDialog}>Open Confirm Dialog</Button> */}
           <MainSections hotIssues={hotIssues.data} recommendedTools={recommendedTools.data} popularSideHustles={popularSideHustles.data} />
         </Suspense>
       </div>

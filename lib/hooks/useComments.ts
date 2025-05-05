@@ -1,6 +1,8 @@
-import { useState } from "react";
+"use client";
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { TargetType } from "@/types/content";
+import { TargetType, TargetTypes } from "@/types/content";
 import { useUserStore } from "@/store/useUserStore";
 
 export interface Comment {
@@ -8,6 +10,10 @@ export interface Comment {
   author: string;
   content: string;
   createdAt: string;
+  likes: number;
+  dislikes: number;
+  hasLiked?: boolean;
+  hasDisliked?: boolean;
 }
 
 interface RawComment {
@@ -35,52 +41,50 @@ interface UpdateCommentDto {
 }
 
 export const useComments = (target_type: TargetType, target_id: number) => {
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { token } = useUserStore();
+  const queryClient = useQueryClient();
 
   const normalize = (raw: RawComment): Comment => ({
     id: raw.id,
     author: raw.user.username,
     content: raw.content,
     createdAt: raw.created_at,
+    likes: 0,
+    dislikes: 0,
+    hasLiked: false,
+    hasDisliked: false,
   });
 
-  const fetchComments = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axios.get<RawComment[]>(`/api/comments`, {
-        params: { target_type: target_type, target_id: target_id },
+  // 댓글 목록 가져오기
+  const {
+    data: comments = [],
+    isLoading,
+    error,
+  } = useQuery<Comment[]>({
+    queryKey: ["comments", target_type, target_id],
+    queryFn: async () => {
+      const res = await axios.get<RawComment[]>("/api/comments", {
+        params: {
+          target_type: target_type.toUpperCase(),
+          target_id,
+        },
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
 
-      const sorted = response.data.map(normalize).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      return res.data.map(normalize).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    },
+    enabled: !!target_type && !!target_id,
+  });
 
-      setComments(sorted);
-    } catch (err) {
-      setError("댓글을 불러오는데 실패했습니다.");
-      console.error("Error fetching comments:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const createComment = async (content: string) => {
-    if (!token) {
-      setError("로그인이 필요합니다.");
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axios.post<RawComment>(
-        `/api/comments`,
+  // 댓글 작성
+  const createCommentMutation = useMutation({
+    mutationFn: async (content: string) => {
+      const res = await axios.post<RawComment>(
+        "/api/comments",
         {
           content,
-          target_type: target_type,
-          target_id: target_id,
+          target_type: target_type.toUpperCase(),
+          target_id,
         } as CreateCommentDto,
         {
           headers: {
@@ -88,80 +92,17 @@ export const useComments = (target_type: TargetType, target_id: number) => {
           },
         }
       );
-
-      const newComment = normalize(response.data);
-      setComments((prev) => [newComment, ...prev]); // 최신순 prepend
-      return newComment;
-    } catch (err) {
-      setError("댓글 작성에 실패했습니다.");
-      console.error("Error creating comment:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateComment = async (commentId: number, content: string) => {
-    if (!token) {
-      setError("로그인이 필요합니다.");
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axios.put<RawComment>(
-        `/api/comments/${commentId}`,
-        {
-          content,
-        } as UpdateCommentDto,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const updated = normalize(response.data);
-      setComments((prev) => prev.map((comment) => (comment.id === commentId ? updated : comment)));
-      return updated;
-    } catch (err) {
-      setError("댓글 수정에 실패했습니다.");
-      console.error("Error updating comment:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deleteComment = async (commentId: number) => {
-    if (!token) {
-      setError("로그인이 필요합니다.");
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    try {
-      await axios.delete(`/api/comments/${commentId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setComments((prev) => prev.filter((comment) => comment.id !== commentId));
-    } catch (err) {
-      setError("댓글 삭제에 실패했습니다.");
-      console.error("Error deleting comment:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return normalize(res.data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["comments", target_type, target_id] });
+    },
+  });
 
   return {
     comments,
-    loading,
+    isLoading,
     error,
-    fetchComments,
-    createComment,
-    updateComment,
-    deleteComment,
+    createComment: createCommentMutation.mutateAsync,
   };
 };

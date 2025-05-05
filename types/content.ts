@@ -5,6 +5,7 @@ export const TargetTypes = {
   TOOL: "TOOL",
   SIDE_HUSTLE: "SIDE_HUSTLE",
   DEV_LOG: "DEV_LOG",
+  COMMENT: "COMMENT",
 } as const;
 
 export type TargetType = (typeof TargetTypes)[keyof typeof TargetTypes];

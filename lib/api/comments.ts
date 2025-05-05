@@ -27,8 +27,10 @@ export const commentApi = {
     });
   },
 
-  getComments: (target_type: string, target_id: string): Promise<CommentResponse[]> => {
-    return apiClient.get<CommentResponse[]>(`/comments?target_type=${target_type}&target_id=${target_id}`);
+  getComments: (target_type: string, target_id: string, authHeader?: string): Promise<CommentResponse[]> => {
+    return apiClient.get<CommentResponse[]>(`/comments?target_type=${target_type}&target_id=${target_id}`, {
+      headers: authHeader ? { Authorization: authHeader } : undefined,
+    });
   },
 
   updateComment: (id: string, data: Partial<CommentRequest>, authToken: string): Promise<CommentResponse> => {

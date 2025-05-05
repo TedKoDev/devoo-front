@@ -10,8 +10,8 @@ export interface InteractionCountsDto {
 }
 
 export interface UserInteractions {
-  hasLiked: boolean;
-  hasDisliked: boolean;
+  has_liked: boolean;
+  has_disliked: boolean;
 }
 
 export interface InteractionRequest {
@@ -33,7 +33,7 @@ export const useInteractions = (target_type: TargetType, target_id: number) => {
     },
   });
 
-  const { data: userInteractions = { hasLiked: false, hasDisliked: false } } = useQuery({
+  const { data: userInteractions = { has_liked: false, has_disliked: false } } = useQuery({
     queryKey: ["interactions", "user", target_type, target_id],
     queryFn: async () => {
       const response = await fetch(`/api/interactions/user?target_type=${target_type}&target_id=${target_id}`, {
@@ -173,10 +173,10 @@ export const useInteractions = (target_type: TargetType, target_id: number) => {
     }
 
     try {
-      if (userInteractions.hasLiked) {
+      if (userInteractions.has_liked) {
         await removeLikeMutation.mutateAsync({ target_type, target_id });
       } else {
-        if (userInteractions.hasDisliked) {
+        if (userInteractions.has_disliked) {
           await removeDislikeMutation.mutateAsync({ target_type, target_id });
         }
         await likeMutation.mutateAsync({ target_type, target_id });
@@ -197,10 +197,10 @@ export const useInteractions = (target_type: TargetType, target_id: number) => {
     }
 
     try {
-      if (userInteractions.hasDisliked) {
+      if (userInteractions.has_disliked) {
         await removeDislikeMutation.mutateAsync({ target_type, target_id });
       } else {
-        if (userInteractions.hasLiked) {
+        if (userInteractions.has_liked) {
           await removeLikeMutation.mutateAsync({ target_type, target_id });
         }
         await dislikeMutation.mutateAsync({ target_type, target_id });

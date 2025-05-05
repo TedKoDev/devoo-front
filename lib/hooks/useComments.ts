@@ -12,8 +12,8 @@ export interface Comment {
   createdAt: string;
   likes: number;
   dislikes: number;
-  hasLiked?: boolean;
-  hasDisliked?: boolean;
+  has_liked?: boolean;
+  has_disliked?: boolean;
 }
 
 interface RawComment {
@@ -51,8 +51,8 @@ export const useComments = (target_type: TargetType, target_id: number) => {
     createdAt: raw.created_at,
     likes: 0,
     dislikes: 0,
-    hasLiked: false,
-    hasDisliked: false,
+    has_liked: false,
+    has_disliked: false,
   });
 
   // 댓글 목록 가져오기

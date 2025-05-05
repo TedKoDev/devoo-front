@@ -18,8 +18,8 @@ export interface InteractionCountsDto {
 }
 
 export interface UserInteractions {
-  hasLiked: boolean;
-  hasDisliked: boolean;
+  has_liked: boolean;
+  has_disliked: boolean;
 }
 
 export const interactionApi = {

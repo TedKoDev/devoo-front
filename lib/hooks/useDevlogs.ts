@@ -80,12 +80,12 @@ export function useDevlog() {
 
   // 개발일지 수정 mutation
   const updateDevlogMutation = useMutation({
-    mutationFn: async (data: DevlogRequest) => {
+    mutationFn: async ({ id, ...data }: DevlogRequest & { id: string }) => {
       if (!token) {
         throw new Error("로그인이 필요합니다.");
       }
 
-      const response = await fetch("/api/devlogs", {
+      const response = await fetch(`/api/devlogs/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -101,22 +101,24 @@ export function useDevlog() {
 
       return response.json();
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["devlogs"] });
+    },
   });
 
   // 개발일지 삭제 mutation
   const deleteDevlogMutation = useMutation({
-    mutationFn: async (data: DevlogRequest) => {
+    mutationFn: async (id: string) => {
       if (!token) {
         throw new Error("로그인이 필요합니다.");
       }
 
-      const response = await fetch("/api/devlogs", {
+      const response = await fetch(`/api/devlogs/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
@@ -125,6 +127,9 @@ export function useDevlog() {
       }
 
       return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["devlogs"] });
     },
   });
 
@@ -137,6 +142,7 @@ export function useDevlog() {
     error: getDevlogs.error,
   };
 }
+
 // 단일 게시글 조회 query
 export function useSingleDevlog(id: string) {
   const { token } = useUserStore();

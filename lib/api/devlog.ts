@@ -27,11 +27,23 @@ export const devlogApi = {
     });
   },
 
-  getDevlogs: (): Promise<DevlogResponse[]> => apiClient.get<DevlogResponse[]>("/dev-logs"),
+  getDevlogs: (authHeader?: string): Promise<DevlogResponse[]> =>
+    apiClient.get<DevlogResponse[]>("/dev-logs", {
+      headers: authHeader ? { Authorization: authHeader } : undefined,
+    }),
 
-  updateDevlog: (id: string, data: DevlogRequest): Promise<DevlogResponse> => apiClient.put<DevlogResponse>(`/dev-logs/${id}`, data),
+  updateDevlog: (id: string, data: DevlogRequest, authHeader?: string): Promise<DevlogResponse> =>
+    apiClient.put<DevlogResponse>(`/dev-logs/${id}`, data, {
+      headers: authHeader ? { Authorization: authHeader } : undefined,
+    }),
 
-  deleteDevlog: (id: string): Promise<void> => apiClient.delete(`/dev-logs/${id}`),
+  deleteDevlog: (id: string, authHeader?: string): Promise<void> =>
+    apiClient.delete(`/dev-logs/${id}`, {
+      headers: authHeader ? { Authorization: authHeader } : undefined,
+    }),
 
-  getDevlogById: (id: number): Promise<DevlogResponse> => apiClient.get<DevlogResponse>(`/dev-logs/${id}`),
+  getDevlogById: (id: number, authHeader?: string): Promise<DevlogResponse> =>
+    apiClient.get<DevlogResponse>(`/dev-logs/${id}`, {
+      headers: authHeader ? { Authorization: authHeader } : undefined,
+    }),
 };

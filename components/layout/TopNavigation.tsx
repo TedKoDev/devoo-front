@@ -13,7 +13,7 @@ export default function TopNavigation() {
     // { label: "부업정보", href: "/side-hustles" },
     { label: "개발일지", href: "/devlogs" },
     // { label: "커뮤니티", href: "/community" },
-    // { label: "블로그", href: "/blog" },
+    { label: "블로그", href: "/blog" },
     // { label: "툴 요청", href: "/tool-requests" },
   ];
 

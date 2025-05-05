@@ -1,4 +1,5 @@
 import { useEditor, EditorContent } from "@tiptap/react";
+import { useEffect } from "react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
@@ -62,7 +63,7 @@ export default function TiptapEditor({ content, onChange, placeholder = "내용�
         emptyEditorClass: "is-editor-empty",
       }),
     ],
-    content: content ? `<p style="font-size: 16px">${content}</p>` : '<p style="font-size: 16px"><br></p>',
+    content: content || '<p style="font-size: 16px"><br></p>',
     editorProps: {
       attributes: {
         class: "prose-lg focus:outline-none",
@@ -74,6 +75,14 @@ export default function TiptapEditor({ content, onChange, placeholder = "내용�
     },
     editable,
   });
+
+  // content가 변경될 때 에디터 내용 업데이트
+  useEffect(() => {
+    if (editor && content && editor.getHTML() !== content) {
+      console.log("TiptapEditor: Updating content to:", content);
+      editor.commands.setContent(content);
+    }
+  }, [content, editor]);
 
   return (
     <div className={`border rounded-md bg-white flex-1 flex flex-col ${className}`}>

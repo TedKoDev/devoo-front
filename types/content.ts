@@ -10,6 +10,20 @@ export const TargetTypes = {
 
 export type TargetType = (typeof TargetTypes)[keyof typeof TargetTypes];
 
+// enum PublishStatus {
+//   PENDING
+//   SUCCESS
+//   FAILED
+//   RETRYING
+// }
+
+export enum PublishStatus {
+  PENDING = "PENDING",
+  SUCCESS = "SUCCESS",
+  FAILED = "FAILED",
+  RETRYING = "RETRYING",
+}
+
 export interface HotIssue {
   id: string;
   title: string;

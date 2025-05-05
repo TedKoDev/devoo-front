@@ -95,7 +95,12 @@ export const useComments = (target_type: TargetType, target_id: number) => {
       return normalize(res.data);
     },
     onSuccess: () => {
+      // 댓글 목록 쿼리 무효화
       queryClient.invalidateQueries({ queryKey: ["comments", target_type, target_id] });
+      // 개발일지 목록 쿼리 무효화
+      queryClient.invalidateQueries({ queryKey: ["devlogs"] });
+      // 단일 개발일지 쿼리 무효화
+      queryClient.invalidateQueries({ queryKey: ["devlog"] });
     },
   });
 

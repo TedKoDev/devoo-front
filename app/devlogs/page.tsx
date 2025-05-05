@@ -6,8 +6,11 @@ import { Button } from "@/components/ui/button";
 import ReadingTime from "@/components/utils/ReadingTime";
 import calculateReadingTime from "@/components/utils/CalculateReadingTime";
 import { useRouter } from "next/navigation";
+import { useUserStore } from "@/store/useUserStore";
 
 export default function DevLogsPage() {
+  const { user } = useUserStore();
+  console.log("user", user);
   const { devlogs, isLoading, error } = useDevlog();
   const router = useRouter();
 
@@ -18,9 +21,12 @@ export default function DevLogsPage() {
     <div className="container mx-auto py-8 px-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">개발일지</h1>
-        <Link href="/devlogs/create">
-          <Button>새 개발일지 작성</Button>
-        </Link>
+
+        {user?.username == "devoong" && (
+          <Link href="/devlogs/create">
+            <Button>새 개발일지 작성</Button>
+          </Link>
+        )}
       </div>
 
       <div className="grid gap-4">

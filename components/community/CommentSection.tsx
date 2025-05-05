@@ -18,30 +18,7 @@ interface CommentProps {
 }
 
 function Comment({ comment, isExpanded, onToggleExpand }: CommentProps) {
-  const interactions = useInteractions(TargetTypes.COMMENT, comment.id);
-  const { counts, userInteractions } = interactions;
-
-  const handleLike = () => {
-    if (userInteractions.hasLiked) {
-      interactions.removeLike({ target_type: TargetTypes.COMMENT, target_id: comment.id });
-    } else {
-      if (userInteractions.hasDisliked) {
-        interactions.removeDislike({ target_type: TargetTypes.COMMENT, target_id: comment.id });
-      }
-      interactions.addLike({ target_type: TargetTypes.COMMENT, target_id: comment.id });
-    }
-  };
-
-  const handleDislike = () => {
-    if (userInteractions.hasDisliked) {
-      interactions.removeDislike({ target_type: TargetTypes.COMMENT, target_id: comment.id });
-    } else {
-      if (userInteractions.hasLiked) {
-        interactions.removeLike({ target_type: TargetTypes.COMMENT, target_id: comment.id });
-      }
-      interactions.addDislike({ target_type: TargetTypes.COMMENT, target_id: comment.id });
-    }
-  };
+  const { counts, userInteractions, handleLike, handleDislike } = useInteractions(TargetTypes.COMMENT, comment.id);
 
   const isLongComment = (content: string) => {
     return content.split("\n").length > 5;
@@ -55,12 +32,20 @@ function Comment({ comment, isExpanded, onToggleExpand }: CommentProps) {
       <div className="flex justify-between items-start">
         <div className="text-sm font-medium">{comment.author}</div>
         <div className="flex items-center gap-2">
-          <button className={`flex items-center gap-1 ${userInteractions.hasLiked ? "text-blue-600" : "text-gray-500 hover:text-blue-600"}`} onClick={handleLike}>
-            <ThumbsUp className="w-4 h-4" />
+          <button
+            className={`flex items-center gap-1 px-2 py-1 rounded text-xs
+              ${userInteractions.has_liked ? "bg-blue-600 text-white hover:bg-blue-700 border border-blue-600" : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"}`}
+            onClick={handleLike}
+          >
+            <ThumbsUp className={`w-4 h-4 ${userInteractions.has_liked ? "text-white" : "text-gray-700"}`} />
             <span className="text-xs">{counts.likes}</span>
           </button>
-          <button className={`flex items-center gap-1 ${userInteractions.hasDisliked ? "text-red-600" : "text-gray-500 hover:text-red-600"}`} onClick={handleDislike}>
-            <ThumbsDown className="w-4 h-4" />
+          <button
+            className={`flex items-center gap-1 px-2 py-1 rounded text-xs
+              ${userInteractions.has_disliked ? "bg-red-600 text-white hover:bg-red-700 border border-red-600" : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"}`}
+            onClick={handleDislike}
+          >
+            <ThumbsDown className={`w-4 h-4 ${userInteractions.has_disliked ? "text-white" : "text-gray-700"}`} />
             <span className="text-xs">{counts.dislikes}</span>
           </button>
         </div>

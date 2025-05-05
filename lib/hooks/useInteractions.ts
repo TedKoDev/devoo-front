@@ -45,6 +45,15 @@ export const useInteractions = (target_type: TargetType, target_id: number) => {
     enabled: !!token,
   });
 
+  const invalidateQueries = () => {
+    queryClient.invalidateQueries({ queryKey: ["interactions", "counts", target_type, target_id] });
+    queryClient.invalidateQueries({ queryKey: ["interactions", "user", target_type, target_id] });
+    // 개발일지 목록 쿼리 무효화
+    queryClient.invalidateQueries({ queryKey: ["devlogs"] });
+    // 단일 개발일지 쿼리 무효화
+    queryClient.invalidateQueries({ queryKey: ["devlog"] });
+  };
+
   const likeMutation = useMutation({
     mutationFn: async (data: InteractionRequest) => {
       if (!token) throw new Error("로그인이 필요합니다.");
@@ -63,8 +72,7 @@ export const useInteractions = (target_type: TargetType, target_id: number) => {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["interactions", "counts", target_type, target_id] });
-      queryClient.invalidateQueries({ queryKey: ["interactions", "user", target_type, target_id] });
+      invalidateQueries();
     },
     onError: (error) => {
       toast({
@@ -89,8 +97,7 @@ export const useInteractions = (target_type: TargetType, target_id: number) => {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["interactions", "counts", target_type, target_id] });
-      queryClient.invalidateQueries({ queryKey: ["interactions", "user", target_type, target_id] });
+      invalidateQueries();
     },
     onError: (error) => {
       toast({
@@ -119,8 +126,7 @@ export const useInteractions = (target_type: TargetType, target_id: number) => {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["interactions", "counts", target_type, target_id] });
-      queryClient.invalidateQueries({ queryKey: ["interactions", "user", target_type, target_id] });
+      invalidateQueries();
     },
     onError: (error) => {
       toast({
@@ -145,8 +151,7 @@ export const useInteractions = (target_type: TargetType, target_id: number) => {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["interactions", "counts", target_type, target_id] });
-      queryClient.invalidateQueries({ queryKey: ["interactions", "user", target_type, target_id] });
+      invalidateQueries();
     },
     onError: (error) => {
       toast({
@@ -157,13 +162,59 @@ export const useInteractions = (target_type: TargetType, target_id: number) => {
     },
   });
 
+  const handleLike = async () => {
+    if (!token) {
+      toast({
+        title: "로그인 필요",
+        description: "좋아요를 하려면 로그인이 필요합니다.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      if (userInteractions.hasLiked) {
+        await removeLikeMutation.mutateAsync({ target_type, target_id });
+      } else {
+        if (userInteractions.hasDisliked) {
+          await removeDislikeMutation.mutateAsync({ target_type, target_id });
+        }
+        await likeMutation.mutateAsync({ target_type, target_id });
+      }
+    } catch (error) {
+      console.error("좋아요 처리 중 오류 발생:", error);
+    }
+  };
+
+  const handleDislike = async () => {
+    if (!token) {
+      toast({
+        title: "로그인 필요",
+        description: "싫어요를 하려면 로그인이 필요합니다.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      if (userInteractions.hasDisliked) {
+        await removeDislikeMutation.mutateAsync({ target_type, target_id });
+      } else {
+        if (userInteractions.hasLiked) {
+          await removeLikeMutation.mutateAsync({ target_type, target_id });
+        }
+        await dislikeMutation.mutateAsync({ target_type, target_id });
+      }
+    } catch (error) {
+      console.error("싫어요 처리 중 오류 발생:", error);
+    }
+  };
+
   return {
     counts,
     userInteractions,
-    addLike: likeMutation.mutateAsync,
-    removeLike: removeLikeMutation.mutateAsync,
-    addDislike: dislikeMutation.mutateAsync,
-    removeDislike: removeDislikeMutation.mutateAsync,
+    handleLike,
+    handleDislike,
     isLoading: likeMutation.isPending || removeLikeMutation.isPending || dislikeMutation.isPending || removeDislikeMutation.isPending,
     error: likeMutation.error || removeLikeMutation.error || dislikeMutation.error || removeDislikeMutation.error,
   };

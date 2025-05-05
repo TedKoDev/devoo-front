@@ -8,15 +8,14 @@ import { TargetType } from "@/types/content";
 export default function CommentSection({ target_type, target_id }: { target_type: TargetType; target_id: number }) {
   const { comments, loading, fetchComments, createComment } = useComments(target_type, target_id);
   const [newComment, setNewComment] = useState("");
-  const [authorName, setAuthorName] = useState("");
 
   useEffect(() => {
     fetchComments();
   }, [target_id, target_type]);
 
   const handleAddComment = async () => {
-    if (!authorName || !newComment.trim()) {
-      alert("작성자 이름과 댓글을 모두 입력해주세요.");
+    if (!newComment.trim()) {
+      alert(" 댓글을 입력해주세요.");
       return;
     }
     await createComment(newComment);
@@ -32,7 +31,6 @@ export default function CommentSection({ target_type, target_id }: { target_type
 
       {/* 댓글 작성 */}
       <div className="flex flex-col gap-2 mb-4">
-        <input className="w-full border rounded-md p-2 text-sm" placeholder="작성자 이름" value={authorName} onChange={(e) => setAuthorName(e.target.value)} />
         <textarea className="w-full border rounded-md p-2 text-sm" rows={3} placeholder="댓글을 입력하세요" value={newComment} onChange={(e) => setNewComment(e.target.value)} />
         <button className="self-end bg-blue-600 text-white px-4 py-1.5 rounded-md text-sm hover:bg-blue-700" onClick={handleAddComment}>
           댓글 작성

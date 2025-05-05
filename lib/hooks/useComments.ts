@@ -50,7 +50,7 @@ export const useComments = (target_type: TargetType, target_id: number) => {
     setError(null);
     try {
       const response = await axios.get<RawComment[]>(`/api/comments`, {
-        params: { target_type, target_id },
+        params: { target_type: target_type, target_id: target_id },
       });
 
       const sorted = response.data.map(normalize).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -70,8 +70,8 @@ export const useComments = (target_type: TargetType, target_id: number) => {
     try {
       const response = await axios.post<RawComment>(`/api/comments`, {
         content,
-        target_type,
-        target_id,
+        target_type: target_type,
+        target_id: target_id,
       } as CreateCommentDto);
 
       const newComment = normalize(response.data);

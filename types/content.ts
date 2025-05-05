@@ -67,3 +67,22 @@ export interface ToolRequest {
   status: "requested" | "in_progress" | "completed";
   date: string;
 }
+
+export interface CreateInteractionDto {
+  target_type: TargetType;
+  target_id: number;
+}
+
+export interface InteractionResponseDto {
+  id: number;
+  user_id: number;
+  target_type: TargetType;
+  target_id: number;
+  created_at: Date;
+}
+
+export interface InteractionCountsDto {
+  likes: number;
+  dislikes: number;
+  comments: number;
+}

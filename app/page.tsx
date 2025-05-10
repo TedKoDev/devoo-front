@@ -89,7 +89,7 @@ export default function Home() {
 
   return (
     <div className="py-6">
-      {/* <CustomizableWidgetGrid
+      <CustomizableWidgetGrid
         searchTrends={searchTrends.data}
         stockMarkets={stockMarkets.data}
         recommendedStocks={[]} // TODO: API 구현 후 recommendedStocks.data로 변경
@@ -98,7 +98,7 @@ export default function Home() {
         oilPrice={oilPrice.data}
         goldPrice={goldPrice.data}
         exchangeRates={exchangeRates.data}
-      /> */}
+      />
 
       <div className="mt-12">
         <Suspense fallback={<SectionSkeleton />}>

@@ -5,18 +5,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "@/store/useUserStore";
 
 export interface BlogPost {
-  id: string;
+  id: number;
   title: string;
-  content: string;
-  date: Date;
+  date: string;
   summary: string;
-  blog_type: string;
-  keyword_id: number;
-  blog_channel_id: number;
-  publish_status: string;
-  created_at: Date;
-  updated_at: Date;
-  view_count: number;
+  content: string;
+  category: string;
   author: {
     id: number;
     username: string;
@@ -26,6 +20,10 @@ export interface BlogPost {
     dislikes: number;
     comments: number;
   };
+  views: number;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
 }
 
 export function useBlogPost() {
@@ -58,6 +56,9 @@ export function useBlogPost() {
     mutationFn: async (id: string) => {
       if (!token) throw new Error("로그인이 필요합니다.");
       return blogPostApi.deleteBlogPost(Number(id), `Bearer ${token}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["blogPosts"] });
     },
   });
 

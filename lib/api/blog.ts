@@ -12,6 +12,8 @@ export interface BlogPostRequest {
   content?: string;
   publish_status?: PublishStatus;
   blog_type?: string;
+  tag_ids?: number[];
+  author_id?: number;
 }
 
 export interface BlogPostResponse {
@@ -27,6 +29,19 @@ export interface BlogPostResponse {
   updated_at: Date;
   deleted_at?: Date;
   view_count: number;
+  tags: Array<{
+    id: number;
+    name: string;
+  }>;
+  author: {
+    id: number;
+    username: string;
+  };
+  interactions: {
+    likes: number;
+    dislikes: number;
+    comments: number;
+  };
 }
 
 // ============================

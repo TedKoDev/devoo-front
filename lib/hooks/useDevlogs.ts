@@ -99,10 +99,11 @@ export function useDevlog() {
         throw new Error(errorData.message || "개발일지 수정에 실패했습니다.");
       }
 
-      return response.json();
+      return { ...response.json(), id };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["devlogs"] });
+      queryClient.invalidateQueries({ queryKey: ["devlog", data.id] });
     },
   });
 

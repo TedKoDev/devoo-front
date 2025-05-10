@@ -1,12 +1,9 @@
 import { useState } from "react";
+import { s3Api } from "@/lib/api/s3";
 
 interface UseS3UploadOptions {
   onSuccess?: (url: string) => void;
   onError?: (error: Error) => void;
-}
-
-interface UploadResponse {
-  url: string;
 }
 
 export const useS3Upload = ({ onSuccess, onError }: UseS3UploadOptions = {}) => {
@@ -19,23 +16,11 @@ export const useS3Upload = ({ onSuccess, onError }: UseS3UploadOptions = {}) => 
       setError(null);
 
       // 1. Get presigned URL from backend
-      const presignedUrlResponse = await fetch("/api/s3/presigned-url", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          key: `uploads/${Date.now()}-${file.name}`,
-          type: "put",
-          contentType: file.type,
-        }),
+      const { url: presignedUrl } = await s3Api.getPresignedUrl({
+        key: `uploads/${Date.now()}-${file.name}`,
+        type: "put",
+        contentType: file.type,
       });
-
-      if (!presignedUrlResponse.ok) {
-        throw new Error("Failed to get presigned URL");
-      }
-
-      const { url: presignedUrl } = (await presignedUrlResponse.json()) as UploadResponse;
 
       // 2. Upload file to S3 using presigned URL
       const uploadResponse = await fetch(presignedUrl, {
@@ -51,8 +36,11 @@ export const useS3Upload = ({ onSuccess, onError }: UseS3UploadOptions = {}) => 
       }
 
       // 3. Get the public URL of the uploaded file
-      const fileKey = presignedUrl.split("?")[0].split("/").pop();
-      const publicUrl = `https://${process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/${fileKey}`;
+      const urlParts = presignedUrl.split("?")[0].split("/");
+      const bucketName = urlParts[2].split(".")[0]; // Extract bucket name from presigned URL
+      const fileKey = urlParts.slice(3).join("/"); // Get the full path after bucket name
+
+      const publicUrl = `https://${bucketName}.s3.ap-northeast-2.amazonaws.com/${fileKey}`;
 
       onSuccess?.(publicUrl);
       return publicUrl;

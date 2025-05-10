@@ -18,12 +18,21 @@ import {
   Type,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useS3Upload } from "@/hooks/useS3Upload";
 
 interface MenuBarProps {
   editor: Editor | null;
 }
 
 export default function MenuBar({ editor }: MenuBarProps) {
+  const { uploadImage, isUploading } = useS3Upload({
+    onSuccess: (url) => {
+      if (editor) {
+        editor.chain().focus().setImage({ src: url }).run();
+      }
+    },
+  });
+
   if (!editor) {
     return null;
   }
@@ -45,6 +54,17 @@ export default function MenuBar({ editor }: MenuBarProps) {
   const setFontSize = (size: string) => {
     if (!editor) return;
     editor.chain().focus().setFontSize(size).run();
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      await uploadImage(file);
+    } catch (error) {
+      console.error("Failed to upload image:", error);
+    }
   };
 
   return (
@@ -101,12 +121,20 @@ export default function MenuBar({ editor }: MenuBarProps) {
       <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().setTextAlign("right").run()} className={editor.isActive({ textAlign: "right" }) ? "bg-muted" : ""}>
         <AlignRight className="h-4 w-4" />
       </Button>
-      <Button type="button" variant="ghost" size="sm" onClick={addImage}>
-        <ImageIcon className="h-4 w-4" />
-      </Button>
+      <div className="relative">
+        <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" id="image-upload" />
+        <label htmlFor="image-upload" className="p-2 rounded cursor-pointer hover:bg-gray-100">
+          <ImageIcon className="h-4 w-4" />
+        </label>
+      </div>
       <Button type="button" variant="ghost" size="sm" onClick={addLink} className={editor.isActive("link") ? "bg-muted" : ""}>
         <LinkIcon className="h-4 w-4" />
       </Button>
+      {isUploading && (
+        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="text-white">이미지 업로드 중...</div>
+        </div>
+      )}
     </div>
   );
 }

@@ -12,8 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useUserStore } from "@/store/useUserStore";
 import StockMarketWidget from "@/components/widgets/StockMarketWidget";
 import SearchTrendsWidget from "@/components/widgets/SearchTrendsWidget";
-import OilPriceWidget from "@/components/widgets/OilPriceWidget";
-import GoldPriceWidget from "@/components/widgets/GoldPriceWidget";
+import GoldOilWidget from "@/components/widgets/GoldOilWidget";
 import ExchangeRatesWidget from "@/components/widgets/ExchangeRatesWidget";
 import GlobalIssuesWidget from "@/components/widgets/GlobalIssuesWidget";
 import RecommendedStocksWidget from "@/components/widgets/RecommendedStocksWidget";
@@ -38,89 +37,78 @@ const widgetDefinitions = [
     description: "주요 포털 사이트의 실시간 검색어 순위를 확인할 수 있습니다.",
     category: "트렌드",
   },
-  // {
-  //   id: "oilPrice",
-  //   name: "유가",
-  //   defaultVisible: true,
-  //   description: "국제 유가 정보와 변동률을 제공합니다.",
-  //   category: "원자재",
-  // },
-  // {
-  //   id: "goldPrice",
-  //   name: "금 시세",
-  //   defaultVisible: true,
-  //   description: "금 시세 정보와 변동률을 제공합니다.",
-  //   category: "원자재",
-  // },
-  // {
-  //   id: "exchangeRates",
-  //   name: "환율",
-  //   defaultVisible: true,
-  //   description: "주요 통화의 환율 정보를 제공합니다.",
-  //   category: "금융",
-  // },
-  // {
-  //   id: "stockMarket",
-  //   name: "주요 증시",
-  //   defaultVisible: true,
-  //   description: "국내외 주요 증시 지수와 등락률을 실시간으로 제공합니다.",
-  //   category: "금융",
-  // },
-
-  // {
-  //   id: "recommendedStocks",
-  //   name: "추천 종목",
-  //   defaultVisible: true,
-  //   description: "국내외 추천 주식 종목 정보를 제공합니다.",
-  //   category: "투자",
-  // },
-  // {
-  //   id: "globalIssues",
-  //   name: "글로벌 이슈",
-  //   defaultVisible: true,
-  //   description: "글로벌 금융 시장에 영향을 미치는 주요 이슈를 제공합니다.",
-  //   category: "뉴스",
-  // },
-  // {
-  //   id: "marketCalendar",
-  //   name: "증시 이슈 캘린더",
-  //   defaultVisible: true,
-  //   description: "주요 경제 지표 발표, 실적 발표 등 증시 관련 일정을 제공합니다.",
-  //   category: "금융",
-  // },
+  {
+    id: "goldOil",
+    name: "금/유가 시세",
+    defaultVisible: true,
+    description: "금과 국제 유가 정보와 변동률을 제공합니다.",
+    category: "원자재",
+  },
+  {
+    id: "exchangeRates",
+    name: "환율",
+    defaultVisible: true,
+    description: "주요 통화의 환율 정보를 제공합니다.",
+    category: "금융",
+  },
+  {
+    id: "stockMarket",
+    name: "주요 증시",
+    defaultVisible: true,
+    description: "국내외 주요 증시 지수와 등락률을 실시간으로 제공합니다.",
+    category: "금융",
+  },
+  {
+    id: "recommendedStocks",
+    name: "추천 종목",
+    defaultVisible: true,
+    description: "국내외 추천 주식 종목 정보를 제공합니다.",
+    category: "투자",
+  },
+  {
+    id: "globalIssues",
+    name: "글로벌 이슈",
+    defaultVisible: true,
+    description: "글로벌 금융 시장에 영향을 미치는 주요 이슈를 제공합니다.",
+    category: "뉴스",
+  },
+  {
+    id: "marketCalendar",
+    name: "증시 이슈 캘린더",
+    defaultVisible: true,
+    description: "주요 경제 지표 발표, 실적 발표 등 증시 관련 일정을 제공합니다.",
+    category: "금융",
+  },
 ];
 
 // 기본 레이아웃 설정
 const defaultLayouts = {
   lg: [
-    { i: "stockMarket", x: 0, y: 0, w: 1, h: 1 },
-    { i: "searchTrends", x: 1, y: 0, w: 1, h: 1 },
-    { i: "recommendedStocks", x: 2, y: 0, w: 1, h: 1 },
-    { i: "globalIssues", x: 0, y: 1, w: 1, h: 1 },
-    { i: "marketCalendar", x: 1, y: 1, w: 1, h: 1 },
-    { i: "oilPrice", x: 2, y: 1, w: 1, h: 1 },
-    { i: "goldPrice", x: 0, y: 2, w: 1, h: 1 },
-    { i: "exchangeRates", x: 1, y: 2, w: 1, h: 1 },
+    { i: "stockMarket", x: 0, y: 0, w: 1, h: 2 },
+    { i: "searchTrends", x: 0, y: 1, w: 1, h: 2 },
+    { i: "goldOil", x: 2, y: 1, w: 1, h: 2 },
+    { i: "exchangeRates", x: 1, y: 2, w: 1, h: 2 },
+    { i: "recommendedStocks", x: 2, y: 0, w: 1, h: 2 },
+    { i: "globalIssues", x: 0, y: 1, w: 1, h: 2 },
+    { i: "marketCalendar", x: 1, y: 1, w: 1, h: 2 },
   ],
   md: [
-    { i: "stockMarket", x: 0, y: 0, w: 1, h: 1 },
-    { i: "searchTrends", x: 1, y: 0, w: 1, h: 1 },
-    { i: "recommendedStocks", x: 0, y: 1, w: 1, h: 1 },
-    { i: "globalIssues", x: 1, y: 1, w: 1, h: 1 },
-    { i: "marketCalendar", x: 0, y: 2, w: 1, h: 1 },
-    { i: "oilPrice", x: 1, y: 2, w: 1, h: 1 },
-    { i: "goldPrice", x: 0, y: 3, w: 1, h: 1 },
-    { i: "exchangeRates", x: 1, y: 3, w: 1, h: 1 },
+    { i: "stockMarket", x: 0, y: 0, w: 1, h: 2 },
+    { i: "searchTrends", x: 0, y: 1, w: 1, h: 2 },
+    { i: "goldOil", x: 1, y: 2, w: 1, h: 2 },
+    { i: "exchangeRates", x: 1, y: 3, w: 1, h: 2 },
+    { i: "recommendedStocks", x: 0, y: 2, w: 1, h: 2 },
+    { i: "globalIssues", x: 1, y: 1, w: 1, h: 2 },
+    { i: "marketCalendar", x: 0, y: 2, w: 1, h: 2 },
   ],
   sm: [
-    { i: "stockMarket", x: 0, y: 0, w: 1, h: 1 },
-    { i: "searchTrends", x: 0, y: 1, w: 1, h: 1 },
-    { i: "recommendedStocks", x: 0, y: 2, w: 1, h: 1 },
-    { i: "globalIssues", x: 0, y: 3, w: 1, h: 1 },
-    { i: "marketCalendar", x: 0, y: 4, w: 1, h: 1 },
-    { i: "oilPrice", x: 0, y: 5, w: 1, h: 1 },
-    { i: "goldPrice", x: 0, y: 6, w: 1, h: 1 },
-    { i: "exchangeRates", x: 0, y: 7, w: 1, h: 1 },
+    { i: "stockMarket", x: 0, y: 0, w: 1, h: 2 },
+    { i: "searchTrends", x: 0, y: 1, w: 1, h: 2 },
+    { i: "goldOil", x: 0, y: 5, w: 1, h: 2 },
+    { i: "exchangeRates", x: 0, y: 7, w: 1, h: 2 },
+    { i: "recommendedStocks", x: 0, y: 2, w: 1, h: 2 },
+    { i: "globalIssues", x: 0, y: 3, w: 1, h: 2 },
+    { i: "marketCalendar", x: 0, y: 4, w: 1, h: 2 },
   ],
 };
 
@@ -130,12 +118,11 @@ interface CustomizableWidgetGridProps {
   recommendedStocks: any;
   globalIssues: any;
   marketEvents: any;
-  oilPrice: any;
-  goldPrice: any;
+  goldOil: any;
   exchangeRates: any;
 }
 
-export default function CustomizableWidgetGrid({ searchTrends, stockMarkets, recommendedStocks, globalIssues, marketEvents, oilPrice, goldPrice, exchangeRates }: CustomizableWidgetGridProps) {
+export default function CustomizableWidgetGrid({ searchTrends, stockMarkets, recommendedStocks, globalIssues, marketEvents, goldOil, exchangeRates }: CustomizableWidgetGridProps) {
   const { isLoggedIn, user } = useUserStore();
   const { toast } = useToast();
 
@@ -231,24 +218,22 @@ export default function CustomizableWidgetGrid({ searchTrends, stockMarkets, rec
   // 위젯 렌더링 함수
   const renderWidget = (widgetId: string) => {
     switch (widgetId) {
-      case "stockMarket":
-        return <StockMarketWidget data={stockMarkets} />;
       case "searchTrends":
         return <SearchTrendsWidget data={searchTrends} />;
+      case "stockMarket":
+        return <StockMarketWidget data={stockMarkets} />;
+      case "goldOil":
+        return <GoldOilWidget />;
+      case "exchangeRates":
+        return <ExchangeRatesWidget />;
       case "recommendedStocks":
         return <RecommendedStocksWidget data={recommendedStocks} />;
       case "globalIssues":
         return <GlobalIssuesWidget data={globalIssues} />;
       case "marketCalendar":
         return <MarketCalendarWidget data={marketEvents} />;
-      case "oilPrice":
-        return <OilPriceWidget data={oilPrice} />;
-      case "goldPrice":
-        return <GoldPriceWidget data={goldPrice} />;
-      case "exchangeRates":
-        return <ExchangeRatesWidget data={exchangeRates} />;
       default:
-        return <div>Unknown widget</div>;
+        return null;
     }
   };
 
@@ -270,19 +255,21 @@ export default function CustomizableWidgetGrid({ searchTrends, stockMarkets, rec
             .filter((widget) => widget.defaultVisible)
             .map((widget) => (
               <div key={widget.id} className="relative">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button className="absolute top-2 right-2 z-10 p-1 rounded-full bg-white/80 hover:bg-white">
-                        <HelpCircle className="h-4 w-4 text-gray-500" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="max-w-xs">{widget.description}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                {renderWidget(widget.id)}
+                <div className="relative h-full">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button className="absolute top-2 right-2 z-10 p-1 rounded-full bg-white/80 hover:bg-white">
+                          <HelpCircle className="h-4 w-4 text-gray-500" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs">{widget.description}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  {renderWidget(widget.id)}
+                </div>
               </div>
             ))}
         </div>
@@ -357,31 +344,35 @@ export default function CustomizableWidgetGrid({ searchTrends, stockMarkets, rec
         layouts={layouts}
         breakpoints={{ lg: 1200, md: 768, sm: 480 }}
         cols={{ lg: 3, md: 2, sm: 1 }}
-        rowHeight={250}
+        rowHeight={200}
+        margin={[16, 16]}
+        containerPadding={[0, 0]}
         isDraggable={isEditMode}
         isResizable={false}
         onLayoutChange={handleLayoutChange}
-        margin={[16, 16]}
+        autoSize={true}
       >
         {widgetDefinitions.map(
           (widget) =>
             visibleWidgets[widget.id] && (
-              <div key={widget.id} className={isEditMode ? "widget-edit-mode" : "relative"}>
-                {!isEditMode && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button className="absolute top-2 right-2 z-10 p-1 rounded-full bg-white/80 hover:bg-white">
-                          <HelpCircle className="h-4 w-4 text-gray-500" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="max-w-xs">{widget.description}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-                {renderWidget(widget.id)}
+              <div key={widget.id} className={`${isEditMode ? "border-2 border-dashed border-blue-300" : ""}`}>
+                <div className="h-auto">
+                  {!isEditMode && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="absolute top-2 right-2 z-10 p-1 rounded-full bg-white/80 hover:bg-white">
+                            <HelpCircle className="h-4 w-4 text-gray-500" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="max-w-xs">{widget.description}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                  {renderWidget(widget.id)}
+                </div>
               </div>
             )
         )}

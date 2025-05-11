@@ -1,29 +1,29 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Search } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { useRouter } from "next/navigation"
-import { useMobile } from "@/hooks/use-mobile"
-import TopNavigation from "./TopNavigation"
-import { useUserStore } from "@/store/useUserStore"
+import { useState } from "react";
+import Link from "next/link";
+import { Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
+import { useMobile } from "@/hooks/use-mobile";
+import TopNavigation from "./TopNavigation";
+import { useUserStore } from "@/store/useUserStore";
 
 export default function Header() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const router = useRouter()
-  const isMobile = useMobile()
-  const { isLoggedIn, user, logout } = useUserStore()
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+  const isMobile = useMobile();
+  const { isLoggedIn, user, logout } = useUserStore();
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
-  }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
@@ -32,7 +32,7 @@ export default function Header() {
           <span className="text-xl font-bold text-primary">Devooup_hub</span>
         </Link>
 
-        {!isMobile && (
+        {/* {!isMobile && (
           <form onSubmit={handleSearch} className="flex-1 mx-4 max-w-md">
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -45,7 +45,7 @@ export default function Header() {
               />
             </div>
           </form>
-        )}
+        )} */}
 
         <div className="flex items-center space-x-2">
           {isLoggedIn ? (
@@ -70,5 +70,5 @@ export default function Header() {
 
       {!isMobile && <TopNavigation />}
     </header>
-  )
+  );
 }

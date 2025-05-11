@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { useSearchParams } from "next/navigation"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
-import { Search } from "lucide-react"
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 export default function SearchPage() {
-  const searchParams = useSearchParams()
-  const initialQuery = searchParams.get("q") || ""
-  const [searchQuery, setSearchQuery] = useState(initialQuery)
-  const [activeTab, setActiveTab] = useState("all")
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get("q") || "";
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
+  const [activeTab, setActiveTab] = useState("all");
 
   // Mock search results
   const [results, setResults] = useState({
@@ -21,7 +21,7 @@ export default function SearchPage() {
     sideHustles: [] as any[],
     devlogs: [] as any[],
     hotIssues: [] as any[],
-  })
+  });
 
   useEffect(() => {
     if (searchQuery.trim()) {
@@ -68,8 +68,8 @@ export default function SearchPage() {
             { id: 1, title: "2023년 개발자 연봉 동향", description: "IT 업계 급여 상승세 지속" },
             { id: 2, title: "부업으로 월 300만원 버는 프리랜서 개발자의 비법", description: "실제 사례와 팁 공유" },
           ],
-        })
-      }, 500)
+        });
+      }, 500);
     } else {
       setResults({
         all: [],
@@ -77,23 +77,23 @@ export default function SearchPage() {
         sideHustles: [],
         devlogs: [],
         hotIssues: [],
-      })
+      });
     }
-  }, [searchQuery])
+  }, [searchQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // Update URL with search query
-    const url = new URL(window.location.href)
-    url.searchParams.set("q", searchQuery)
-    window.history.pushState({}, "", url.toString())
-  }
+    const url = new URL(window.location.href);
+    url.searchParams.set("q", searchQuery);
+    window.history.pushState({}, "", url.toString());
+  };
 
   return (
     <div className="py-6">
       <h1 className="text-2xl font-bold mb-6">검색</h1>
 
-      <form onSubmit={handleSearch} className="mb-6">
+      {/* <form onSubmit={handleSearch} className="mb-6">
         <div className="relative">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
@@ -104,7 +104,7 @@ export default function SearchPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-      </form>
+      </form> */}
 
       {searchQuery.trim() && (
         <>
@@ -189,5 +189,5 @@ export default function SearchPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

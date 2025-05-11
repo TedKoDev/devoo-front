@@ -39,19 +39,9 @@ export default function Home() {
       alert("사용자가 취소를 눌렀습니다.");
     }
   };
+
   // React Query를 사용하여 데이터 가져오기
-  const {
-    searchTrends,
-    stockMarkets,
-    goldPrice,
-    oilPrice,
-    exchangeRates,
-    globalIssues,
-    marketEvents,
-    // recommendedStocks,
-    isLoading: isMarketDataLoading,
-    isError: isMarketDataError,
-  } = useAllMarketData();
+  const { searchTrends, stockMarkets, globalIssues, marketEvents, exchangeRates, isLoading: isMarketDataLoading, isError: isMarketDataError } = useAllMarketData();
 
   const { hotIssues, recommendedTools, popularSideHustles, isLoading: isContentLoading, isError: isContentError } = useAllContent();
 
@@ -95,14 +85,11 @@ export default function Home() {
         recommendedStocks={[]} // TODO: API 구현 후 recommendedStocks.data로 변경
         globalIssues={globalIssues.data}
         marketEvents={marketEvents.data}
-        oilPrice={oilPrice.data}
-        goldPrice={goldPrice.data}
         exchangeRates={exchangeRates.data}
       />
 
       <div className="mt-12">
         <Suspense fallback={<SectionSkeleton />}>
-          {/* <Button onClick={handleOpenDialog}>Open Confirm Dialog</Button> */}
           <MainSections hotIssues={hotIssues.data} recommendedTools={recommendedTools.data} popularSideHustles={popularSideHustles.data} />
         </Suspense>
       </div>

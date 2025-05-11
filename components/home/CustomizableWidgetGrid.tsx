@@ -84,31 +84,34 @@ const widgetDefinitions = [
 // 기본 레이아웃 설정
 const defaultLayouts = {
   lg: [
-    { i: "stockMarket", x: 0, y: 0, w: 1, h: 2 },
-    { i: "searchTrends", x: 0, y: 1, w: 1, h: 2 },
-    { i: "goldOil", x: 2, y: 1, w: 1, h: 2 },
-    { i: "exchangeRates", x: 1, y: 2, w: 1, h: 2 },
-    { i: "recommendedStocks", x: 2, y: 0, w: 1, h: 2 },
-    { i: "globalIssues", x: 0, y: 1, w: 1, h: 2 },
-    { i: "marketCalendar", x: 1, y: 1, w: 1, h: 2 },
+    { i: "searchTrends", x: 0, y: 0, w: 1, h: 1 },
+    { i: "goldOil", x: 1, y: 0, w: 1, h: 1 },
+    { i: "exchangeRates", x: 2, y: 0, w: 1, h: 1 },
+
+    { i: "stockMarket", x: 0, y: 1, w: 1, h: 1 },
+    { i: "recommendedStocks", x: 1, y: 1, w: 1, h: 1 },
+    { i: "globalIssues", x: 2, y: 1, w: 1, h: 1 },
+    { i: "marketCalendar", x: 0, y: 2, w: 1, h: 1 },
   ],
   md: [
-    { i: "stockMarket", x: 0, y: 0, w: 1, h: 2 },
-    { i: "searchTrends", x: 0, y: 1, w: 1, h: 2 },
-    { i: "goldOil", x: 1, y: 2, w: 1, h: 2 },
-    { i: "exchangeRates", x: 1, y: 3, w: 1, h: 2 },
-    { i: "recommendedStocks", x: 0, y: 2, w: 1, h: 2 },
-    { i: "globalIssues", x: 1, y: 1, w: 1, h: 2 },
-    { i: "marketCalendar", x: 0, y: 2, w: 1, h: 2 },
+    { i: "searchTrends", x: 0, y: 0, w: 1, h: 1 },
+    { i: "goldOil", x: 1, y: 0, w: 1, h: 1 },
+    { i: "exchangeRates", x: 0, y: 1, w: 1, h: 1 },
+
+    { i: "stockMarket", x: 1, y: 1, w: 1, h: 1 },
+    { i: "recommendedStocks", x: 0, y: 2, w: 1, h: 1 },
+    { i: "globalIssues", x: 1, y: 2, w: 1, h: 1 },
+    { i: "marketCalendar", x: 0, y: 3, w: 2, h: 1 },
   ],
   sm: [
-    { i: "stockMarket", x: 0, y: 0, w: 1, h: 2 },
-    { i: "searchTrends", x: 0, y: 1, w: 1, h: 2 },
-    { i: "goldOil", x: 0, y: 5, w: 1, h: 2 },
-    { i: "exchangeRates", x: 0, y: 7, w: 1, h: 2 },
-    { i: "recommendedStocks", x: 0, y: 2, w: 1, h: 2 },
-    { i: "globalIssues", x: 0, y: 3, w: 1, h: 2 },
-    { i: "marketCalendar", x: 0, y: 4, w: 1, h: 2 },
+    { i: "searchTrends", x: 0, y: 0, w: 1, h: 1 },
+    { i: "goldOil", x: 0, y: 1, w: 1, h: 1 },
+    { i: "exchangeRates", x: 0, y: 2, w: 1, h: 1 },
+
+    { i: "stockMarket", x: 0, y: 3, w: 1, h: 1 },
+    { i: "recommendedStocks", x: 0, y: 4, w: 1, h: 1 },
+    { i: "globalIssues", x: 0, y: 5, w: 1, h: 1 },
+    { i: "marketCalendar", x: 0, y: 6, w: 1, h: 1 },
   ],
 };
 
@@ -344,7 +347,7 @@ export default function CustomizableWidgetGrid({ searchTrends, stockMarkets, rec
         layouts={layouts}
         breakpoints={{ lg: 1200, md: 768, sm: 480 }}
         cols={{ lg: 3, md: 2, sm: 1 }}
-        rowHeight={200}
+        rowHeight={450}
         margin={[16, 16]}
         containerPadding={[0, 0]}
         isDraggable={isEditMode}
@@ -356,7 +359,7 @@ export default function CustomizableWidgetGrid({ searchTrends, stockMarkets, rec
           (widget) =>
             visibleWidgets[widget.id] && (
               <div key={widget.id} className={`${isEditMode ? "border-2 border-dashed border-blue-300" : ""}`}>
-                <div className="h-auto">
+                <div className="h-full">
                   {!isEditMode && (
                     <TooltipProvider>
                       <Tooltip>

@@ -1,18 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { marketDataAPI } from "@/lib/api/api-client";
+import { fetchSearchTrends, fetchStockMarket, fetchGoldPrice, fetchOilPrice, fetchExchangeRates, fetchGlobalIssues, fetchMarketEvents } from "@/lib/api/market-data";
 
 // 검색 트렌드 데이터 가져오기
 export function useSearchTrends() {
   return useQuery({
     queryKey: ["searchTrends"],
-    queryFn: async () => {
-      try {
-        return await marketDataAPI.getSearchTrends();
-      } catch (error) {
-        console.error("검색 트렌드 데이터 가져오기 실패:", error);
-        return [];
-      }
-    },
+    queryFn: fetchSearchTrends,
   });
 }
 
@@ -20,14 +13,7 @@ export function useSearchTrends() {
 export function useStockMarkets() {
   return useQuery({
     queryKey: ["stockMarkets"],
-    queryFn: async () => {
-      try {
-        return await marketDataAPI.getStockMarkets();
-      } catch (error) {
-        console.error("주식 시장 데이터 가져오기 실패:", error);
-        return [];
-      }
-    },
+    queryFn: fetchStockMarket,
   });
 }
 
@@ -35,14 +21,7 @@ export function useStockMarkets() {
 export function useGoldPrice() {
   return useQuery({
     queryKey: ["goldPrice"],
-    queryFn: async () => {
-      try {
-        return await marketDataAPI.getGoldPrice();
-      } catch (error) {
-        console.error("금 시세 데이터 가져오기 실패:", error);
-        return {};
-      }
-    },
+    queryFn: fetchGoldPrice,
   });
 }
 
@@ -50,14 +29,7 @@ export function useGoldPrice() {
 export function useOilPrice() {
   return useQuery({
     queryKey: ["oilPrice"],
-    queryFn: async () => {
-      try {
-        return await marketDataAPI.getOilPrice();
-      } catch (error) {
-        console.error("유가 데이터 가져오기 실패:", error);
-        return {};
-      }
-    },
+    queryFn: fetchOilPrice,
   });
 }
 
@@ -65,14 +37,7 @@ export function useOilPrice() {
 export function useExchangeRates() {
   return useQuery({
     queryKey: ["exchangeRates"],
-    queryFn: async () => {
-      try {
-        return await marketDataAPI.getExchangeRates();
-      } catch (error) {
-        console.error("환율 데이터 가져오기 실패:", error);
-        return [];
-      }
-    },
+    queryFn: fetchExchangeRates,
   });
 }
 
@@ -80,14 +45,7 @@ export function useExchangeRates() {
 export function useGlobalIssues() {
   return useQuery({
     queryKey: ["globalIssues"],
-    queryFn: async () => {
-      try {
-        return await marketDataAPI.getGlobalIssues();
-      } catch (error) {
-        console.error("글로벌 이슈 데이터 가져오기 실패:", error);
-        return [];
-      }
-    },
+    queryFn: fetchGlobalIssues,
   });
 }
 
@@ -95,14 +53,7 @@ export function useGlobalIssues() {
 export function useMarketEvents() {
   return useQuery({
     queryKey: ["marketEvents"],
-    queryFn: async () => {
-      try {
-        return await marketDataAPI.getMarketEvents();
-      } catch (error) {
-        console.error("시장 이벤트 데이터 가져오기 실패:", error);
-        return [];
-      }
-    },
+    queryFn: fetchMarketEvents,
   });
 }
 

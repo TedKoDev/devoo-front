@@ -51,34 +51,34 @@ const widgetDefinitions = [
     description: "주요 통화의 환율 정보를 제공합니다.",
     category: "금융",
   },
-  {
-    id: "stockMarket",
-    name: "주요 증시",
-    defaultVisible: true,
-    description: "국내외 주요 증시 지수와 등락률을 실시간으로 제공합니다.",
-    category: "금융",
-  },
-  {
-    id: "recommendedStocks",
-    name: "추천 종목",
-    defaultVisible: true,
-    description: "국내외 추천 주식 종목 정보를 제공합니다.",
-    category: "투자",
-  },
-  {
-    id: "globalIssues",
-    name: "글로벌 이슈",
-    defaultVisible: true,
-    description: "글로벌 금융 시장에 영향을 미치는 주요 이슈를 제공합니다.",
-    category: "뉴스",
-  },
-  {
-    id: "marketCalendar",
-    name: "증시 이슈 캘린더",
-    defaultVisible: true,
-    description: "주요 경제 지표 발표, 실적 발표 등 증시 관련 일정을 제공합니다.",
-    category: "금융",
-  },
+  // {
+  //   id: "stockMarket",
+  //   name: "주요 증시",
+  //   defaultVisible: true,
+  //   description: "국내외 주요 증시 지수와 등락률을 실시간으로 제공합니다.",
+  //   category: "금융",
+  // },
+  // {
+  //   id: "recommendedStocks",
+  //   name: "추천 종목",
+  //   defaultVisible: true,
+  //   description: "국내외 추천 주식 종목 정보를 제공합니다.",
+  //   category: "투자",
+  // },
+  // {
+  //   id: "globalIssues",
+  //   name: "글로벌 이슈",
+  //   defaultVisible: true,
+  //   description: "글로벌 금융 시장에 영향을 미치는 주요 이슈를 제공합니다.",
+  //   category: "뉴스",
+  // },
+  // {
+  //   id: "marketCalendar",
+  //   name: "증시 이슈 캘린더",
+  //   defaultVisible: true,
+  //   description: "주요 경제 지표 발표, 실적 발표 등 증시 관련 일정을 제공합니다.",
+  //   category: "금융",
+  // },
 ];
 
 // 기본 레이아웃 설정
@@ -283,15 +283,15 @@ export default function CustomizableWidgetGrid({ searchTrends, stockMarkets, rec
   return (
     <div className="mb-8">
       {/* 위젯 관리 툴바 */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 mb-4">
         <WidgetHelpDialog />
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           <WidgetTypesDialog />
 
           <Dialog open={isWidgetManageOpen} onOpenChange={setIsWidgetManageOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="flex items-center gap-1">
+              <Button variant="outline" size="sm" className="flex items-center gap-1 text-xs sm:text-sm">
                 <Settings className="h-4 w-4" />
                 <span>위젯 관리</span>
               </Button>
@@ -328,12 +328,12 @@ export default function CustomizableWidgetGrid({ searchTrends, stockMarkets, rec
             </DialogContent>
           </Dialog>
 
-          <Button variant={isEditMode ? "default" : "outline"} size="sm" onClick={() => setIsEditMode(!isEditMode)}>
+          <Button variant={isEditMode ? "default" : "outline"} size="sm" onClick={() => setIsEditMode(!isEditMode)} className="text-xs sm:text-sm">
             {isEditMode ? "편집 완료" : "위젯 위치 변경"}
           </Button>
 
           {isEditMode && (
-            <Button variant="default" size="sm" onClick={saveSettings} className="flex items-center gap-1">
+            <Button variant="default" size="sm" onClick={saveSettings} className="flex items-center gap-1 text-xs sm:text-sm">
               <Save className="h-4 w-4" />
               저장
             </Button>

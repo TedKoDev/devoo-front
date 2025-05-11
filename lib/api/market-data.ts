@@ -1,11 +1,11 @@
-import type { SearchTrend, GoldPrice, OilPrice, ExchangeRate, StockMarket } from "@/types/market"
+import type { SearchTrend, GoldPrice, OilPrice, ExchangeRate, StockMarket } from "@/types/market";
 
 // Mock API for search trends
 export async function fetchSearchTrends(): Promise<{
-  google: SearchTrend[]
-  nate: SearchTrend[]
-  daum: SearchTrend[]
-  zum: SearchTrend[]
+  google: SearchTrend[];
+  nate: SearchTrend[];
+  daum: SearchTrend[];
+  zum: SearchTrend[];
 }> {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -58,9 +58,9 @@ export async function fetchSearchTrends(): Promise<{
           { keyword: "TypeScript 5.0", url: "#" },
           { keyword: "부업 아이디어", url: "#" },
         ],
-      })
-    }, 800)
-  })
+      });
+    }, 800);
+  });
 }
 
 // Mock API for gold price
@@ -72,9 +72,9 @@ export async function fetchGoldPrice(): Promise<GoldPrice> {
         change: 1250,
         changePercent: 1.28,
         updatedAt: "2023-05-15 15:30:00",
-      })
-    }, 600)
-  })
+      });
+    }, 600);
+  });
 }
 
 // Mock API for oil price
@@ -86,9 +86,85 @@ export async function fetchOilPrice(): Promise<OilPrice> {
         change: -25,
         changePercent: -1.49,
         updatedAt: "2023-05-15 15:30:00",
-      })
-    }, 700)
-  })
+      });
+    }, 700);
+  });
+}
+
+// Mock API for global issues
+export async function fetchGlobalIssues() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([
+        {
+          id: "1",
+          title: "미국 금리 동결 전망",
+          summary: "연방준비제도(Fed)의 금리 동결 가능성이 높아지면서 글로벌 금융시장에 영향",
+          date: "2024-02-15",
+          category: "경제",
+          impact: "positive",
+          relatedStocks: [
+            {
+              name: "JP Morgan",
+              symbol: "JPM",
+              price: 187.56,
+              change: 2.34,
+              changePercent: 1.26,
+            },
+          ],
+        },
+        {
+          id: "2",
+          title: "AI 반도체 수요 급증",
+          summary: "생성형 AI 발전으로 인한 고성능 반도체 수요 증가",
+          date: "2024-02-15",
+          category: "기술",
+          impact: "positive",
+          relatedStocks: [
+            {
+              name: "NVIDIA",
+              symbol: "NVDA",
+              price: 726.13,
+              change: 15.89,
+              changePercent: 2.23,
+            },
+          ],
+        },
+      ]);
+    }, 800);
+  });
+}
+
+// Mock API for market events
+export async function fetchMarketEvents() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([
+        {
+          id: "1",
+          title: "미국 소비자물가지수(CPI) 발표",
+          date: "2024-02-20",
+          time: "21:30",
+          country: "미국",
+          importance: "high",
+          category: "economic",
+          description: "1월 소비자물가지수 발표 예정",
+          impact: "neutral",
+        },
+        {
+          id: "2",
+          title: "삼성전자 실적발표",
+          date: "2024-02-22",
+          time: "09:00",
+          country: "한국",
+          importance: "high",
+          category: "earnings",
+          description: "2023년 4분기 실적발표",
+          impact: "neutral",
+        },
+      ]);
+    }, 900);
+  });
 }
 
 // Mock API for exchange rates
@@ -99,30 +175,24 @@ export async function fetchExchangeRates(): Promise<ExchangeRate[]> {
         {
           currency: "미국 달러",
           currencyCode: "USD",
-          rate: 1350.25,
-          change: 5.75,
-        },
-        {
-          currency: "중국 위안",
-          currencyCode: "CNY",
-          rate: 186.42,
-          change: -0.58,
-        },
-        {
-          currency: "일본 엔",
-          currencyCode: "JPY",
-          rate: 8.95,
-          change: 0.12,
+          rate: 1324.5,
+          change: -5.3,
         },
         {
           currency: "유로",
           currencyCode: "EUR",
-          rate: 1456.8,
-          change: 3.2,
+          rate: 1428.75,
+          change: 2.15,
         },
-      ])
-    }, 500)
-  })
+        {
+          currency: "일본 엔",
+          currencyCode: "JPY",
+          rate: 883.25,
+          change: -1.45,
+        },
+      ]);
+    }, 700);
+  });
 }
 
 // Mock API for stock market
@@ -160,7 +230,7 @@ export async function fetchStockMarket(): Promise<StockMarket[]> {
           change: -123.45,
           changePercent: -0.35,
         },
-      ])
-    }, 900)
-  })
+      ]);
+    }, 900);
+  });
 }

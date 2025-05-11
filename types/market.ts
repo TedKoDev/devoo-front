@@ -7,7 +7,7 @@ export interface StockMarket {
 
 export interface SearchTrend {
   keyword: string;
-  trend?: "up" | "down";
+  url: string;
 }
 
 export interface Stock {

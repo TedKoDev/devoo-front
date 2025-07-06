@@ -11,7 +11,7 @@ import TiptapEditor from "@/components/editor/TiptapEditor";
 import { useBlogPost } from "@/lib/hooks/useBlogs";
 import { useToast } from "@/hooks/use-toast";
 import { useUserStore } from "@/store/useUserStore";
-import { PublishStatus } from "@/types/content";
+import { PublishStatus, BLOG_TYPES } from "@/types/content";
 import { BlogPostRequest } from "@/lib/api/blog";
 import { MultiSelect } from "@/components/ui/multi-select";
 
@@ -108,25 +108,9 @@ export default function CreateBlogPage() {
         <h1 className="text-2xl font-bold mb-8">새 블로그 글 작성</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>제목</Label>
-              <Input value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required />
-            </div>
-            <div>
-              <Label>키워드</Label>
-              <Select value={formData.keyword_id.toString()} onValueChange={(value) => setFormData({ ...formData, keyword_id: Number(value) })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="키워드 선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">개발</SelectItem>
-                  <SelectItem value="2">디자인</SelectItem>
-                  <SelectItem value="3">비즈니스</SelectItem>
-                  <SelectItem value="4">기타</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div>
+            <Label>제목</Label>
+            <Input value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -151,10 +135,11 @@ export default function CreateBlogPage() {
                   <SelectValue placeholder="블로그 타입 선택" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="TECH">기술</SelectItem>
-                  <SelectItem value="LIFE">일상</SelectItem>
-                  <SelectItem value="REVIEW">리뷰</SelectItem>
-                  <SelectItem value="TUTORIAL">튜토리얼</SelectItem>
+                  {BLOG_TYPES.filter((type) => type.id !== "ALL").map((type) => (
+                    <SelectItem key={type.id} value={type.id}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

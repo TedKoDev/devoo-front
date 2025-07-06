@@ -9,16 +9,7 @@ import { useUserStore } from "@/store/useUserStore";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-
-const BLOG_TYPES = [
-  { id: "ALL", label: "전체", color: "default" },
-  { id: "TECH", label: "기술", color: "blue" },
-  { id: "LIFE", label: "일상", color: "green" },
-  { id: "REVIEW", label: "리뷰", color: "purple" },
-  { id: "PROJECT", label: "프로젝트", color: "orange" },
-  { id: "JOB", label: "취업", color: "red" },
-  { id: "TUTORIAL", label: "튜토리얼", color: "yellow" },
-];
+import { BLOG_TYPES } from "@/types/content";
 
 const getBlogTypeLabel = (type: string | undefined) => {
   const found = BLOG_TYPES.find((t) => t.id === type);

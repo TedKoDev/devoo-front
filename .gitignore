@@ -3,6 +3,7 @@
 # dependencies
 /node_modules
 
+credentials.json
 # next.js
 /.next/
 /out/

@@ -1,12 +1,11 @@
 // types.ts
-export const TargetTypes = {
-  BLOG_POST: "BLOG_POST",
-  HOT_ISSUE: "HOT_ISSUE",
-  TOOL: "TOOL",
-  SIDE_HUSTLE: "SIDE_HUSTLE",
-  DEV_LOG: "DEV_LOG",
-  COMMENT: "COMMENT",
-} as const;
+export enum TargetTypes {
+  BLOG_POST = "BLOG_POST",
+  DEVLOG = "DEVLOG",
+  HOT_ISSUE = "HOT_ISSUE",
+  SIDE_HUSTLE = "SIDE_HUSTLE",
+  TOOL = "TOOL",
+}
 
 export type TargetType = (typeof TargetTypes)[keyof typeof TargetTypes];
 
@@ -27,12 +26,74 @@ export enum PublishStatus {
 export interface HotIssue {
   id: string;
   title: string;
-  summary: string;
   date: string;
+  thumbnail: string;
+  tags: string[];
+}
+
+export interface Tool {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  rating: number;
+}
+
+export interface SideHustle {
+  id: string;
+  title: string;
   category: string;
-  views: number;
-  likes: number;
-  comments: number;
+  incomeRange: string;
+  description: string;
+  thumbnail: string;
+}
+
+export interface DevLog {
+  id: string;
+  title: string;
+  date: string;
+  summary: string;
+}
+
+// 블로그 타입 정의 (공통으로 사용)
+export const BLOG_TYPES = [
+  { id: "ALL", label: "전체", color: "default" },
+  { id: "TECH", label: "기술", color: "blue" },
+  { id: "LIFE", label: "일상", color: "green" },
+  { id: "REVIEW", label: "리뷰", color: "purple" },
+  { id: "PROJECT", label: "프로젝트", color: "orange" },
+  { id: "JOB", label: "취업", color: "red" },
+  { id: "TUTORIAL", label: "튜토리얼", color: "yellow" },
+] as const;
+
+export type BlogType = (typeof BLOG_TYPES)[number]["id"];
+
+// 키워드 인터페이스
+export interface Keyword {
+  id: number;
+  text: string;
+  status?: string;
+  priority?: number | null;
+  prompt_id?: number;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string | null;
+}
+
+// 블로그 채널 인터페이스
+export interface BlogChannel {
+  id: number;
+  name: string;
+  platform: string;
+  base_url?: string;
+  client_id?: string | null;
+  client_secret?: string | null;
+  access_token?: string | null;
+  refresh_token?: string | null;
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string | null;
 }
 
 export interface RecommendedTool {

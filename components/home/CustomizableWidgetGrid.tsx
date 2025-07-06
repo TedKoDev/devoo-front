@@ -24,6 +24,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import WidgetHelpDialog from "./WidgetHelpDialog";
 import WidgetTypesDialog from "./WidgetTypesDialog";
 import LoginRequiredDialog from "./LoginRequiredDialog";
+import FinvizMapWidget from "@/components/widgets/FinvizMapWidget";
 
 // 반응형 그리드 레이아웃 설정
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -49,6 +50,13 @@ const widgetDefinitions = [
     name: "환율",
     defaultVisible: true,
     description: "주요 통화의 환율 정보를 제공합니다.",
+    category: "금융",
+  },
+  {
+    id: "finvizMap",
+    name: "Finviz 히트맵",
+    defaultVisible: true,
+    description: "미국 주식 시장의 섹터별 등락을 한눈에 볼 수 있는 히트맵입니다.",
     category: "금융",
   },
   // {
@@ -84,34 +92,37 @@ const widgetDefinitions = [
 // 기본 레이아웃 설정
 const defaultLayouts = {
   lg: [
-    { i: "searchTrends", x: 0, y: 0, w: 1, h: 1 },
+    { i: "finvizMap", x: 0, y: 0, w: 3, h: 1 },
+    { i: "searchTrends", x: 0, y: 1, w: 1, h: 1 },
     { i: "goldOil", x: 1, y: 0, w: 1, h: 1 },
     { i: "exchangeRates", x: 2, y: 0, w: 1, h: 1 },
 
-    { i: "stockMarket", x: 0, y: 1, w: 1, h: 1 },
-    { i: "recommendedStocks", x: 1, y: 1, w: 1, h: 1 },
-    { i: "globalIssues", x: 2, y: 1, w: 1, h: 1 },
-    { i: "marketCalendar", x: 0, y: 2, w: 1, h: 1 },
+    { i: "stockMarket", x: 0, y: 2, w: 1, h: 1 },
+    { i: "recommendedStocks", x: 1, y: 2, w: 1, h: 1 },
+    { i: "globalIssues", x: 2, y: 2, w: 1, h: 1 },
+    { i: "marketCalendar", x: 0, y: 3, w: 1, h: 1 },
   ],
   md: [
-    { i: "searchTrends", x: 0, y: 0, w: 1, h: 1 },
+    { i: "finvizMap", x: 0, y: 0, w: 2, h: 1 },
+    { i: "searchTrends", x: 0, y: 1, w: 1, h: 1 },
     { i: "goldOil", x: 1, y: 0, w: 1, h: 1 },
-    { i: "exchangeRates", x: 0, y: 1, w: 1, h: 1 },
-
-    { i: "stockMarket", x: 1, y: 1, w: 1, h: 1 },
-    { i: "recommendedStocks", x: 0, y: 2, w: 1, h: 1 },
-    { i: "globalIssues", x: 1, y: 2, w: 1, h: 1 },
-    { i: "marketCalendar", x: 0, y: 3, w: 2, h: 1 },
-  ],
-  sm: [
-    { i: "searchTrends", x: 0, y: 0, w: 1, h: 1 },
-    { i: "goldOil", x: 0, y: 1, w: 1, h: 1 },
     { i: "exchangeRates", x: 0, y: 2, w: 1, h: 1 },
 
-    { i: "stockMarket", x: 0, y: 3, w: 1, h: 1 },
-    { i: "recommendedStocks", x: 0, y: 4, w: 1, h: 1 },
-    { i: "globalIssues", x: 0, y: 5, w: 1, h: 1 },
-    { i: "marketCalendar", x: 0, y: 6, w: 1, h: 1 },
+    { i: "stockMarket", x: 1, y: 2, w: 1, h: 1 },
+    { i: "recommendedStocks", x: 0, y: 3, w: 1, h: 1 },
+    { i: "globalIssues", x: 1, y: 3, w: 1, h: 1 },
+    { i: "marketCalendar", x: 0, y: 4, w: 2, h: 1 },
+  ],
+  sm: [
+    { i: "finvizMap", x: 0, y: 0, w: 1, h: 1 },
+    { i: "searchTrends", x: 0, y: 1, w: 1, h: 1 },
+    { i: "goldOil", x: 0, y: 2, w: 1, h: 1 },
+    { i: "exchangeRates", x: 0, y: 3, w: 1, h: 1 },
+
+    { i: "stockMarket", x: 0, y: 4, w: 1, h: 1 },
+    { i: "recommendedStocks", x: 0, y: 5, w: 1, h: 1 },
+    { i: "globalIssues", x: 0, y: 6, w: 1, h: 1 },
+    { i: "marketCalendar", x: 0, y: 7, w: 1, h: 1 },
   ],
 };
 
@@ -221,6 +232,8 @@ export default function CustomizableWidgetGrid({ searchTrends, stockMarkets, rec
   // 위젯 렌더링 함수
   const renderWidget = (widgetId: string) => {
     switch (widgetId) {
+      case "finvizMap":
+        return <FinvizMapWidget />;
       case "searchTrends":
         return <SearchTrendsWidget data={searchTrends} />;
       case "stockMarket":

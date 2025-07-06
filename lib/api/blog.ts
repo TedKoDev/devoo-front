@@ -12,7 +12,7 @@ export interface BlogPostRequest {
   content?: string;
   publish_status?: PublishStatus;
   blog_type?: string;
-  tag_ids?: number[];
+  tag_names?: string[];
   author_id?: number;
 }
 

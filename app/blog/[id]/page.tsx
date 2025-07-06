@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import Link from "next/link";
 import { ArrowLeft, Calendar, User, Share2, Bookmark, ThumbsUp, MessageSquare, ThumbsDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -148,8 +149,9 @@ function ShareButton() {
   );
 }
 
-export default function BlogPostDetailPage({ params }: { params: { id: string } }) {
-  const post = getBlogPostDetails(params.id);
+export default function BlogPostDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = React.use(params);
+  const post = getBlogPostDetails(resolvedParams.id);
 
   const { user, token } = useUserStore();
   const router = useRouter();
@@ -245,7 +247,7 @@ export default function BlogPostDetailPage({ params }: { params: { id: string } 
             <div className="flex flex-wrap gap-2 mb-6">
               {post.tags.map((tag, index) => (
                 <Badge key={index} variant="secondary">
-                  {tag}
+                  {typeof tag === "string" ? tag : (tag as any).name || (tag as any).label || "태그"}
                 </Badge>
               ))}
             </div>
@@ -284,7 +286,7 @@ export default function BlogPostDetailPage({ params }: { params: { id: string } 
                 <div className="flex flex-wrap gap-1 mt-1">
                   {post.tags.map((tag, index) => (
                     <Badge key={index} variant="outline" className="text-xs">
-                      {tag}
+                      {typeof tag === "string" ? tag : (tag as any).name || (tag as any).label || "태그"}
                     </Badge>
                   ))}
                 </div>

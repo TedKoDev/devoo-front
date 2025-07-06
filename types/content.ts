@@ -1,10 +1,11 @@
 // types.ts
 export enum TargetTypes {
   BLOG_POST = "BLOG_POST",
-  DEVLOG = "DEVLOG",
+  DEV_LOG = "DEV_LOG",
   HOT_ISSUE = "HOT_ISSUE",
   SIDE_HUSTLE = "SIDE_HUSTLE",
   TOOL = "TOOL",
+  COMMENT = "COMMENT",
 }
 
 export type TargetType = (typeof TargetTypes)[keyof typeof TargetTypes];

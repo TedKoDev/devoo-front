@@ -24,7 +24,7 @@ export default function BlogSection() {
     <div className="section-card">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-bold">블로그</h2>
-        <Link href="/blogs" className="text-sm text-primary flex items-center">
+        <Link href="/blog" className="text-sm text-primary flex items-center">
           더보기 <ArrowRight className="h-3 w-3 ml-1" />
         </Link>
       </div>
@@ -33,7 +33,7 @@ export default function BlogSection() {
         {blogPosts.slice(0, 3).map((blog: BlogPostResponse) => {
           const thumbnailUrl = getThumbnailUrl(blog.content);
           return (
-            <Link href={`/blogs/${blog.id}`} key={blog.id} className="block hover:bg-gray-50 p-2 rounded-md -mx-2 transition-colors">
+            <Link href={`/blog/${blog.id}`} key={blog.id} className="block hover:bg-gray-50 p-2 rounded-md -mx-2 transition-colors">
               <div className="flex gap-3">
                 {thumbnailUrl && (
                   <div className="relative w-20 h-20 flex-shrink-0">

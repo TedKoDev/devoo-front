@@ -29,6 +29,7 @@ export default function CreateBlogPage() {
     publish_status: PublishStatus;
     blog_type: string;
     tag_ids: number[];
+    tag_names: string[];
     author_id: number;
   }>({
     title: "",
@@ -38,6 +39,7 @@ export default function CreateBlogPage() {
     publish_status: PublishStatus.SUCCESS,
     blog_type: "TECH",
     tag_ids: [],
+    tag_names: [],
     author_id: 2,
   });
 
@@ -81,7 +83,7 @@ export default function CreateBlogPage() {
         keyword_id: formData.keyword_id,
         publish_status: formData.publish_status,
         blog_type: formData.blog_type,
-        tag_ids: formData.tag_ids,
+        tag_names: formData.tag_names,
       });
       toast({
         title: "성공",
@@ -149,20 +151,124 @@ export default function CreateBlogPage() {
             <Label>태그</Label>
             <MultiSelect
               options={[
+                // 프론트엔드
                 { value: 1, label: "JavaScript" },
                 { value: 2, label: "TypeScript" },
                 { value: 3, label: "React" },
                 { value: 4, label: "Next.js" },
-                { value: 5, label: "Node.js" },
-                { value: 6, label: "Python" },
-                { value: 7, label: "Django" },
-                { value: 8, label: "Flask" },
-                { value: 9, label: "AWS" },
-                { value: 10, label: "Docker" },
+                { value: 5, label: "Vue.js" },
+                { value: 6, label: "Angular" },
+                { value: 7, label: "Svelte" },
+                { value: 8, label: "HTML" },
+                { value: 9, label: "CSS" },
+                { value: 10, label: "SCSS" },
+                { value: 11, label: "Tailwind CSS" },
+                { value: 12, label: "Bootstrap" },
+                { value: 13, label: "Redux" },
+                { value: 14, label: "Zustand" },
+                { value: 15, label: "GraphQL" },
+
+                // 백엔드
+                { value: 16, label: "Node.js" },
+                { value: 17, label: "Python" },
+                { value: 18, label: "Django" },
+                { value: 19, label: "Flask" },
+                { value: 20, label: "FastAPI" },
+                { value: 21, label: "Java" },
+                { value: 22, label: "Spring Boot" },
+                { value: 23, label: "Go" },
+                { value: 24, label: "Rust" },
+                { value: 25, label: "PHP" },
+                { value: 26, label: "Laravel" },
+                { value: 27, label: "C#" },
+                { value: 28, label: ".NET" },
+
+                // 데이터베이스
+                { value: 29, label: "MySQL" },
+                { value: 30, label: "PostgreSQL" },
+                { value: 31, label: "MongoDB" },
+                { value: 32, label: "Redis" },
+                { value: 33, label: "SQLite" },
+                { value: 34, label: "Elasticsearch" },
+
+                // 클라우드 & DevOps
+                { value: 35, label: "AWS" },
+                { value: 36, label: "Docker" },
+                { value: 37, label: "Kubernetes" },
+                { value: 38, label: "Azure" },
+                { value: 39, label: "GCP" },
+                { value: 40, label: "Vercel" },
+                { value: 41, label: "Netlify" },
+                { value: 42, label: "GitHub Actions" },
+                { value: 43, label: "Jenkins" },
+                { value: 44, label: "Terraform" },
+
+                // 모바일 & 데스크톱
+                { value: 45, label: "React Native" },
+                { value: 46, label: "Flutter" },
+                { value: 47, label: "Swift" },
+                { value: 48, label: "Kotlin" },
+                { value: 49, label: "Electron" },
+                { value: 50, label: "Tauri" },
+
+                // AI & ML
+                { value: 51, label: "AI" },
+                { value: 52, label: "Machine Learning" },
+                { value: 53, label: "Deep Learning" },
+                { value: 54, label: "TensorFlow" },
+                { value: 55, label: "PyTorch" },
+                { value: 56, label: "OpenAI" },
+                { value: 57, label: "ChatGPT" },
+                { value: 58, label: "Computer Vision" },
+                { value: 59, label: "NLP" },
+
+                // 개발 도구
+                { value: 60, label: "Git" },
+                { value: 61, label: "VS Code" },
+                { value: 62, label: "Webpack" },
+                { value: 63, label: "Vite" },
+                { value: 64, label: "ESLint" },
+                { value: 65, label: "Prettier" },
+                { value: 66, label: "Jest" },
+                { value: 67, label: "Cypress" },
+                { value: 68, label: "Storybook" },
+
+                // 기타 기술
+                { value: 69, label: "WebRTC" },
+                { value: 70, label: "WebSocket" },
+                { value: 71, label: "PWA" },
+                { value: 72, label: "Microservices" },
+                { value: 73, label: "Serverless" },
+                { value: 74, label: "JAMstack" },
+                { value: 75, label: "Blockchain" },
+                { value: 76, label: "Web3" },
+                { value: 77, label: "NFT" },
+                { value: 78, label: "Cryptocurrency" },
+
+                // 비즈니스 & 커리어
+                { value: 79, label: "프리랜서" },
+                { value: 80, label: "스타트업" },
+                { value: 81, label: "투자" },
+                { value: 82, label: "마케팅" },
+                { value: 83, label: "UX/UI" },
+                { value: 84, label: "프로젝트 관리" },
+                { value: 85, label: "애자일" },
+                { value: 86, label: "스크럼" },
+                { value: 87, label: "리더십" },
+                { value: 88, label: "커리어" },
+                { value: 89, label: "면접" },
+                { value: 90, label: "이력서" },
               ]}
               value={formData.tag_ids}
-              onChange={(values) => setFormData({ ...formData, tag_ids: values })}
-              placeholder="태그 선택"
+              onChange={(values, labels) =>
+                setFormData({
+                  ...formData,
+                  tag_ids: values,
+                  tag_names: labels || [],
+                })
+              }
+              placeholder="태그 선택 (쉼표로 구분하거나 직접 입력)"
+              allowCustomInput={true}
             />
           </div>
 

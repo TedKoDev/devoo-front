@@ -7,30 +7,24 @@ interface SheetRow {
   주소: string;
 }
 
-async function getLatestFinvizImage(): Promise<string> {
+async function getFinvizImageUrl(): Promise<{ imageUrl: string | null; date: string | null }> {
   try {
-    const response = await fetch(CSV_URL);
-
-    console.log("response", response);
-    const csvText = await response.text();
-    const rows = csvText.split("\n").map((row) => row.split(",").map((cell) => cell.trim()));
-
-    if (!rows || rows.length < 2) {
-      throw new Error("No data found in the spreadsheet");
+    console.log('Fetching Finviz data from API route');
+    
+    const response = await fetch('/api/sheets/finviz');
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-
-    // 첫 번째 줄은 헤더이므로 제외하고 첫 번째 데이터 행의 URL 반환
-    const imageUrl = rows[1][1]; // 두 번째 열(B열)의 URL
-
-    if (!imageUrl) {
-      throw new Error("No image URL found in the latest row");
-    }
-
-    return imageUrl;
+    
+    const data = await response.json();
+    console.log('Finviz data received:', data);
+    
+    return data;
   } catch (error) {
-    console.error("Error fetching image URL:", error);
-    throw error;
+    console.error("Error fetching Finviz data:", error);
+    return { imageUrl: null, date: null };
   }
 }
 
-export default getLatestFinvizImage;
+export default getFinvizImageUrl;

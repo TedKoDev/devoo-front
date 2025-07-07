@@ -18,13 +18,15 @@ export const useFinvizStore = create<FinvizState>((set) => ({
   fetchFinvizMap: async () => {
     try {
       set({ isLoading: true, error: null });
-      const url = await getLatestFinvizImage();
+      const data = await getLatestFinvizImage();
+      console.log('Store received data:', data);
       set({
-        imageUrl: url,
-        lastFetched: new Date().toISOString().slice(0, 10),
+        imageUrl: data.imageUrl || "",
+        lastFetched: data.date || new Date().toISOString().slice(0, 10),
         isLoading: false,
       });
     } catch (error) {
+      console.error('Store error:', error);
       set({ error: error as Error, isLoading: false });
     }
   },

@@ -2,13 +2,44 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
-import { useFinviz } from "@/lib/hooks/useFinviz";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { useFinvizStore } from "@/store/useFinvizStore";
+import { useState, useEffect } from "react";
 
 export default function FinvizMapWidget() {
-  const { imageUrl, isLoading, error } = useFinviz();
-  const { lastFetched } = useFinvizStore();
+  const [imageUrl, setImageUrl] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [lastFetched, setLastFetched] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchFinvizData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await fetch('/api/sheets/finviz');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.imageUrl) {
+          setImageUrl(data.imageUrl);
+          setLastFetched(data.date || new Date().toISOString().slice(0, 10));
+        } else {
+          setError("이미지 URL을 찾을 수 없습니다.");
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // 컴포넌트 마운트 시 한 번만 실행
+    fetchFinvizData();
+  }, []); // 빈 배열로 마운트 시에만 실행
 
   // 현재 날짜의 오전 6시 15분으로 설정
   const formattedDate = lastFetched
@@ -55,7 +86,9 @@ export default function FinvizMapWidget() {
             </DialogContent>
           </Dialog>
         ) : (
-          <div className="flex items-center justify-center h-[400px] text-muted-foreground">{error ? `에러: ${error.message}` : "이미지를 불러올 수 없습니다."}</div>
+          <div className="flex items-center justify-center h-[400px] text-muted-foreground">
+            {error ? `에러: ${error}` : "이미지를 불러올 수 없습니다."}
+          </div>
         )}
       </CardContent>
     </Card>

@@ -33,7 +33,7 @@ export function useDevlog() {
       }
 
       console.log("Submitting devlog with token:", token);
-      const response = await fetch("/api/devlogs", {
+      const response = await fetch("/api/dev-logs", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -62,7 +62,7 @@ export function useDevlog() {
   const getDevlogs = useQuery({
     queryKey: ["devlogs"],
     queryFn: async () => {
-      const response = await fetch("/api/devlogs", {
+      const response = await fetch("/api/dev-logs", {
         headers: {
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` }),
@@ -85,7 +85,7 @@ export function useDevlog() {
         throw new Error("로그인이 필요합니다.");
       }
 
-      const response = await fetch(`/api/devlogs/${id}`, {
+      const response = await fetch(`/api/dev-logs/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -114,7 +114,7 @@ export function useDevlog() {
         throw new Error("로그인이 필요합니다.");
       }
 
-      const response = await fetch(`/api/devlogs/${id}`, {
+      const response = await fetch(`/api/dev-logs/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -151,7 +151,7 @@ export function useSingleDevlog(id: string) {
   const getSingleDevlog = useQuery({
     queryKey: ["devlog", id],
     queryFn: async () => {
-      const response = await fetch(`/api/devlogs/${id}`, {
+      const response = await fetch(`/api/dev-logs/${id}`, {
         headers: {
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` }),

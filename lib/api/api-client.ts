@@ -1,7 +1,9 @@
 import axios from "axios";
 
 // API 클라이언트 설정
-const API_BASE_URL = "http://localhost:4000/api";
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? '/api'  // 프로덕션에서는 상대 경로 사용 (nginx가 프록시)
+  : "http://localhost:4000/api";  // 개발 환경에서는 localhost
 
 // 서버사이드 여부 확인
 const isServer = typeof window === "undefined";

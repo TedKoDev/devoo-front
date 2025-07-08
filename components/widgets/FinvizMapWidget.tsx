@@ -3,9 +3,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 
-export default function FinvizMapWidget() {
+// 구글시트 JSON API URL
+const GOOGLE_SHEETS_JSON_URL = "https://docs.google.com/spreadsheets/d/1D1BM4tC7xvpHJUlVJyQvFb1g3duMX7CS4YoEEY8d1v0/gviz/tq?tqx=out:json&sheet=Finviz";
+
+function FinvizMapWidget() {
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,24 +16,72 @@ export default function FinvizMapWidget() {
 
   useEffect(() => {
     const fetchFinvizData = async () => {
+      const today = new Date().toISOString().slice(0, 10);
+      const cacheKey = `finviz_data_${today}`;
+      
+      // localStorage에서 오늘 데이터 확인
+      const cachedData = localStorage.getItem(cacheKey);
+      if (cachedData) {
+        try {
+          const parsed = JSON.parse(cachedData);
+          console.log('Using cached finviz data:', parsed);
+          setImageUrl(parsed.imageUrl || "");
+          setLastFetched(parsed.date || today);
+          setIsLoading(false);
+          return; // 캐시된 데이터가 있으면 API 호출 생략
+        } catch (e) {
+          console.log('Cache parse error, fetching fresh data');
+        }
+      }
+
       try {
+        console.log('Fetching finviz data directly from Google Sheets...');
         setIsLoading(true);
         setError(null);
         
-        const response = await fetch('/api/sheets/finviz');
+        const response = await fetch(GOOGLE_SHEETS_JSON_URL, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          }
+        });
+        
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const data = await response.json();
+        const responseText = await response.text();
         
-        if (data.imageUrl) {
-          setImageUrl(data.imageUrl);
-          setLastFetched(data.date || new Date().toISOString().slice(0, 10));
+        // 구글시트 JSON 응답에서 실제 JSON 부분만 추출
+        const jsonMatch = responseText.match(/google\.visualization\.Query\.setResponse\((.*)\);/);
+        if (!jsonMatch) {
+          throw new Error('Invalid Google Sheets response format');
+        }
+        
+        const data = JSON.parse(jsonMatch[1]);
+        console.log('Google Sheets data:', data);
+        
+        if (data.table && data.table.rows && data.table.rows.length > 0) {
+          // 마지막 행(최신 데이터) 가져오기
+          const lastRow = data.table.rows[data.table.rows.length - 1];
+          const imageUrl = lastRow.c[1]?.v || ""; // 두 번째 컬럼이 이미지 URL
+          const dateValue = lastRow.c[0]?.f || today; // 첫 번째 컬럼이 날짜 (formatted)
+          
+          console.log('Latest finviz data:', { imageUrl, date: dateValue });
+          
+          setImageUrl(imageUrl);
+          setLastFetched(dateValue);
+          
+          // localStorage에 저장
+          localStorage.setItem(cacheKey, JSON.stringify({
+            imageUrl,
+            date: dateValue,
+            timestamp: Date.now()
+          }));
         } else {
-          setError("이미지 URL을 찾을 수 없습니다.");
+          setError("데이터를 찾을 수 없습니다.");
         }
       } catch (err) {
+        console.error('Finviz fetch error:', err);
         setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
       } finally {
         setIsLoading(false);
@@ -94,3 +145,6 @@ export default function FinvizMapWidget() {
     </Card>
   );
 }
+
+// React.memo로 컴포넌트를 감싸서 불필요한 리렌더링 방지
+export default memo(FinvizMapWidget);

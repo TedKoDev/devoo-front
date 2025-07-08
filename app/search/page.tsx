@@ -1,193 +1,79 @@
 "use client";
 
 import type React from "react";
-
-import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Clock, AlertCircle } from "lucide-react";
 
 export default function SearchPage() {
-  const searchParams = useSearchParams();
-  const initialQuery = searchParams.get("q") || "";
-  const [searchQuery, setSearchQuery] = useState(initialQuery);
-  const [activeTab, setActiveTab] = useState("all");
-
-  // Mock search results
-  const [results, setResults] = useState({
-    all: [] as any[],
-    tools: [] as any[],
-    sideHustles: [] as any[],
-    devlogs: [] as any[],
-    hotIssues: [] as any[],
-  });
-
-  useEffect(() => {
-    if (searchQuery.trim()) {
-      // Simulate search API call
-      setTimeout(() => {
-        setResults({
-          all: [
-            { id: 1, type: "tool", title: "VSCode", description: "가장 인기 있는 코드 에디터" },
-            {
-              id: 2,
-              type: "sideHustle",
-              title: "프리랜서 웹 개발",
-              description: "React, Next.js 등을 활용한 웹 개발 프리랜서 일자리",
-            },
-            {
-              id: 3,
-              type: "devlog",
-              title: "Next.js 앱 라우터 적용기",
-              description: "Next.js 13의 앱 라우터를 적용하면서 겪은 문제와 해결 방법",
-            },
-            { id: 4, type: "hotIssue", title: "2023년 개발자 연봉 동향", description: "IT 업계 급여 상승세 지속" },
-          ],
-          tools: [
-            { id: 1, title: "VSCode", description: "가장 인기 있는 코드 에디터" },
-            { id: 2, title: "Figma", description: "협업 디자인 툴" },
-          ],
-          sideHustles: [
-            { id: 1, title: "프리랜서 웹 개발", description: "React, Next.js 등을 활용한 웹 개발 프리랜서 일자리" },
-            { id: 2, title: "주식 투자", description: "장기 투자를 통한 자산 증식 방법" },
-          ],
-          devlogs: [
-            {
-              id: 1,
-              title: "Next.js 앱 라우터 적용기",
-              description: "Next.js 13의 앱 라우터를 적용하면서 겪은 문제와 해결 방법",
-            },
-            {
-              id: 2,
-              title: "실시간 데이터 연동 구현",
-              description: "금 시세, 환율 등 실시간 데이터 연동 방식 구현 과정",
-            },
-          ],
-          hotIssues: [
-            { id: 1, title: "2023년 개발자 연봉 동향", description: "IT 업계 급여 상승세 지속" },
-            { id: 2, title: "부업으로 월 300만원 버는 프리랜서 개발자의 비법", description: "실제 사례와 팁 공유" },
-          ],
-        });
-      }, 500);
-    } else {
-      setResults({
-        all: [],
-        tools: [],
-        sideHustles: [],
-        devlogs: [],
-        hotIssues: [],
-      });
-    }
-  }, [searchQuery]);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Update URL with search query
-    const url = new URL(window.location.href);
-    url.searchParams.set("q", searchQuery);
-    window.history.pushState({}, "", url.toString());
-  };
-
   return (
-    <div className="py-6">
-      <h1 className="text-2xl font-bold mb-6">검색</h1>
-
-      {/* <form onSubmit={handleSearch} className="mb-6">
-        <div className="relative">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="검색어를 입력하세요"
-            className="pl-10"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-      </form> */}
-
-      {searchQuery.trim() && (
-        <>
-          <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="mb-4">
-              <TabsTrigger value="all">전체 ({results.all.length})</TabsTrigger>
-              <TabsTrigger value="tools">툴 ({results.tools.length})</TabsTrigger>
-              <TabsTrigger value="sideHustles">부업 ({results.sideHustles.length})</TabsTrigger>
-              <TabsTrigger value="devlogs">개발일지 ({results.devlogs.length})</TabsTrigger>
-              <TabsTrigger value="hotIssues">핫이슈 ({results.hotIssues.length})</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="all">
-              <div className="space-y-4">
-                {results.all.map((item) => (
-                  <div key={item.id} className="section-card">
-                    <div className="flex items-center mb-2">
-                      <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">
-                        {item.type === "tool" && "툴"}
-                        {item.type === "sideHustle" && "부업"}
-                        {item.type === "devlog" && "개발일지"}
-                        {item.type === "hotIssue" && "핫이슈"}
+    <div className="py-4 sm:py-6">
+      <h1 className="text-2xl font-bold mb-4 px-2 sm:px-0">검색</h1>
+      
+      {/* 검색 준비중 메인 화면 */}
+      <div className="relative min-h-[60vh] flex items-center justify-center">
+        {/* 배경 요소들 */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-4">
+            {/* 모의 검색 결과 카드들 (배경용) */}
+            {Array.from({ length: 9 }).map((_, index) => (
+              <div
+                key={index}
+                className="bg-gray-100 rounded-xl p-4 border border-gray-200 opacity-50"
+              >
+                <div className="flex items-start space-x-3">
+                  <div className="p-3 rounded-lg bg-gray-200 flex-shrink-0">
+                    <Search className="h-6 w-6 text-gray-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-2/3 mb-2"></div>
+                    <div className="flex items-center">
+                      <span className="text-xs font-medium text-gray-400 bg-gray-200 px-2 py-1 rounded-full">
+                        검색결과
                       </span>
                     </div>
-                    <h2 className="text-lg font-semibold">{item.title}</h2>
-                    <p className="text-gray-600 mt-1">{item.description}</p>
                   </div>
-                ))}
+                </div>
               </div>
-            </TabsContent>
-
-            <TabsContent value="tools">
-              <div className="space-y-4">
-                {results.tools.map((item) => (
-                  <div key={item.id} className="section-card">
-                    <h2 className="text-lg font-semibold">{item.title}</h2>
-                    <p className="text-gray-600 mt-1">{item.description}</p>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="sideHustles">
-              <div className="space-y-4">
-                {results.sideHustles.map((item) => (
-                  <div key={item.id} className="section-card">
-                    <h2 className="text-lg font-semibold">{item.title}</h2>
-                    <p className="text-gray-600 mt-1">{item.description}</p>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="devlogs">
-              <div className="space-y-4">
-                {results.devlogs.map((item) => (
-                  <div key={item.id} className="section-card">
-                    <h2 className="text-lg font-semibold">{item.title}</h2>
-                    <p className="text-gray-600 mt-1">{item.description}</p>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="hotIssues">
-              <div className="space-y-4">
-                {results.hotIssues.map((item) => (
-                  <div key={item.id} className="section-card">
-                    <h2 className="text-lg font-semibold">{item.title}</h2>
-                    <p className="text-gray-600 mt-1">{item.description}</p>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </>
-      )}
-
-      {!searchQuery.trim() && (
-        <div className="text-center py-12">
-          <p className="text-gray-500">검색어를 입력하세요</p>
+            ))}
+          </div>
         </div>
-      )}
+
+        {/* 중앙 준비중 메시지 */}
+        <div className="relative z-10 bg-white rounded-xl p-8 shadow-lg border border-gray-200 mx-4 text-center max-w-md">
+          <div className="mb-4">
+            <div className="bg-orange-100 rounded-full p-4 inline-flex">
+              <Clock className="h-8 w-8 text-orange-500" />
+            </div>
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">검색 기능 준비중</h2>
+          <p className="text-gray-600 mb-4">
+            통합 검색 기능을 개발 중입니다.<br />
+            곧 만나보실 수 있습니다!
+          </p>
+          <div className="inline-flex items-center text-sm text-orange-600 bg-orange-50 px-3 py-2 rounded-full">
+            <AlertCircle className="h-4 w-4 mr-2" />
+            개발 진행중
+          </div>
+        </div>
+      </div>
+
+      {/* 예정 기능 안내 */}
+      <div className="mt-8 mx-2 sm:mx-0 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+        <div className="flex items-start space-x-3">
+          <div className="bg-blue-100 rounded-full p-2 flex-shrink-0">
+            <Search className="h-5 w-5 text-blue-600" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-blue-800 mb-1">🔍 예정 기능</h3>
+            <ul className="text-sm text-blue-700 space-y-1">
+              <li>• 통합 검색 (툴, 부업, 개발일지, 핫이슈 등)</li>
+              <li>• 카테고리별 필터 검색</li>
+              <li>• 태그 기반 검색</li>
+              <li>• 실시간 검색어 자동완성</li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

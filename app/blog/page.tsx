@@ -34,7 +34,7 @@ export default function BlogPage() {
       return imgMatch[1];
     }
 
-    return "/placeholder.svg";
+    return "/photo.png";
   };
 
   return (
@@ -50,19 +50,34 @@ export default function BlogPage() {
 
       {/* Blog Type Tabs */}
       <div className="border-b mb-6">
-        <div className="flex space-x-4">
-          {BLOG_TYPES.map((type) => (
-            <button
-              key={type.id}
-              onClick={() => setActiveTab(type.id)}
-              className={cn(
-                "px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
-                activeTab === type.id ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              )}
-            >
-              {type.label}
-            </button>
-          ))}
+        {/* 모바일에서 스크롤 가능한 탭 네비게이션 */}
+        <div className="overflow-x-auto scrollbar-hide">
+          <div className="flex space-x-1 min-w-max px-2 sm:px-0">
+            {BLOG_TYPES.map((type) => (
+              <button
+                key={type.id}
+                onClick={() => setActiveTab(type.id)}
+                className={cn(
+                  "flex-shrink-0 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-all duration-200",
+                  "whitespace-nowrap rounded-t-lg",
+                  activeTab === type.id 
+                    ? "border-primary text-primary bg-primary/5" 
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50"
+                )}
+              >
+                {type.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        {/* 스크롤 힌트 (모바일에서만 표시) */}
+        <div className="sm:hidden text-center mt-2">
+          <div className="inline-flex items-center text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-full">
+            <span className="mr-1">←</span>
+            좌우로 스와이프하여 더 많은 카테고리 보기
+            <span className="ml-1">→</span>
+          </div>
         </div>
       </div>
 

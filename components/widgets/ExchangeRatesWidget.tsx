@@ -1,33 +1,132 @@
 "use client";
 
-import { useGoldOil } from "@/lib/hooks/useGoldOil";
 import { ArrowUp, ArrowDown, ArrowRightLeft } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState } from "react";
+import { useState, useEffect, memo } from "react";
+
+// 구글시트 JSON API URL (환율 데이터)
+const GOOGLE_SHEETS_JSON_URL = "https://docs.google.com/spreadsheets/d/1D1BM4tC7xvpHJUlVJyQvFb1g3duMX7CS4YoEEY8d1v0/gviz/tq?tqx=out:json&gid=514392219";
+
+interface MarketData {
+  날짜: string;
+  항목: string;
+  가격: string;
+  단위: string;
+  출처: string;
+}
 
 const SUPPORTED_CURRENCIES = ["USD", "EUR", "JPY", "CNY", "RUB"];
 
-export default function ExchangeRatesWidget() {
-  const { data, isLoading, error } = useGoldOil();
+function ExchangeRatesWidget() {
+  const [data, setData] = useState<MarketData[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [fromAmount, setFromAmount] = useState("");
   const [fromCurrency, setFromCurrency] = useState("KRW");
   const [toCurrency, setToCurrency] = useState("USD");
   const [result, setResult] = useState<string>("");
 
+  useEffect(() => {
+    const fetchMarketData = async () => {
+      const today = new Date().toISOString().slice(0, 10);
+      const cacheKey = `market_data_${today}`;
+      
+      // localStorage에서 오늘 데이터 확인
+      const cachedData = localStorage.getItem(cacheKey);
+      if (cachedData) {
+        try {
+          const parsed = JSON.parse(cachedData);
+          console.log('Using cached market data for exchange rates:', parsed);
+          setData(parsed.data || []);
+          setIsLoading(false);
+          return; // 캐시된 데이터가 있으면 API 호출 생략
+        } catch (e) {
+          console.log('Cache parse error, fetching fresh data');
+        }
+      }
+
+      try {
+        console.log('Fetching market data for exchange rates from Google Sheets...');
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await fetch(GOOGLE_SHEETS_JSON_URL, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const responseText = await response.text();
+        
+        // 구글시트 JSON 응답에서 실제 JSON 부분만 추출
+        const jsonMatch = responseText.match(/google\.visualization\.Query\.setResponse\((.*)\);/);
+        if (!jsonMatch) {
+          throw new Error('Invalid Google Sheets response format');
+        }
+        
+        const data = JSON.parse(jsonMatch[1]);
+        console.log('Google Sheets market data for exchange rates:', data);
+        
+        if (data.table && data.table.rows && data.table.rows.length > 0) {
+          // 모든 행을 MarketData 형태로 변환
+          const marketData: MarketData[] = data.table.rows.map((row: any) => ({
+            날짜: row.c[0]?.f || "",      // 첫 번째 컬럼: 날짜
+            항목: row.c[1]?.v || "",      // 두 번째 컬럼: 항목
+            가격: row.c[2]?.v?.toString() || "", // 세 번째 컬럼: 가격
+            단위: row.c[3]?.v || "",      // 네 번째 컬럼: 단위
+            출처: row.c[4]?.v || "",      // 다섯 번째 컬럼: 출처
+          }));
+          
+          console.log('Parsed market data for exchange rates:', marketData);
+          
+          setData(marketData);
+          
+          // localStorage에 저장
+          localStorage.setItem(cacheKey, JSON.stringify({
+            data: marketData,
+            timestamp: Date.now()
+          }));
+        } else {
+          setError("데이터를 찾을 수 없습니다.");
+        }
+      } catch (err) {
+        console.error('Market data fetch error for exchange rates:', err);
+        setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // 컴포넌트 마운트 시 한 번만 실행
+    fetchMarketData();
+  }, []); // 빈 배열로 마운트 시에만 실행
+
   if (isLoading) return <div className="widget-card">Loading...</div>;
   if (error) return <div className="widget-card">Error: {error}</div>;
+
+  // 최신 날짜의 환율 데이터 추출
+  const latestData = data.reduce((acc, curr) => {
+    if (!acc[curr.항목] || curr.날짜 > acc[curr.항목].날짜) {
+      acc[curr.항목] = curr;
+    }
+    return acc;
+  }, {} as Record<string, MarketData>);
 
   // 환율 데이터 추출 및 KRW 기준으로 변환
   const rates = SUPPORTED_CURRENCIES.map((currency) => {
     let row;
     if (currency === "USD") {
-      row = data.find((r) => r.항목 === "USD/KRW");
+      row = latestData["USD/KRW"];
     } else {
-      row = data.find((r) => r.항목 === `USD/${currency}`);
+      row = latestData[`USD/${currency}`];
     }
 
     if (!row) {
@@ -41,7 +140,7 @@ export default function ExchangeRatesWidget() {
     if (currency === "USD") {
       krwRate = baseRate;
     } else {
-      const usdKrwRate = data.find((r) => r.항목 === "USD/KRW");
+      const usdKrwRate = latestData["USD/KRW"];
       if (!usdKrwRate) {
         console.log("Missing USD/KRW rate");
         return null;
@@ -53,8 +152,8 @@ export default function ExchangeRatesWidget() {
       currency,
       krwRate,
       date: row.날짜,
-      change: row.변화량,
-      changePercent: row.변화율,
+      change: 0, // 변화량 데이터가 없으므로 0으로 설정
+      changePercent: 0, // 변화율 데이터가 없으므로 0으로 설정
     };
   }).filter((rate): rate is NonNullable<typeof rate> => rate !== null);
 
@@ -215,33 +314,33 @@ export default function ExchangeRatesWidget() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">금액</label>
-              <Input
-                type="text"
-                value={fromAmount}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^\d,]/g, "");
-                  setFromAmount(value);
-                }}
-                placeholder="금액을 입력하세요"
-              />
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-sm font-medium mb-1 block">
+                  금액 ({getCurrencySymbol(fromCurrency)})
+                </label>
+                <Input
+                  type="text"
+                  value={fromAmount}
+                  onChange={(e) => setFromAmount(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">
+                  결과 ({getCurrencySymbol(toCurrency)})
+                </label>
+                <Input value={result} readOnly placeholder="0" />
+              </div>
             </div>
 
             <Button onClick={calculateConversion} className="w-full">
-              계산하기
+              환율 계산
             </Button>
 
-            {result && (
-              <div className="p-4 bg-gray-50 rounded-lg mt-4">
-                <div className="text-sm text-gray-500 mb-1">변환 결과</div>
-                <div className="text-lg font-semibold">
-                  {fromAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ",")} {fromCurrency} =
-                </div>
-                <div className="text-2xl font-bold text-primary">
-                  {parseFloat(result).toLocaleString()} {toCurrency}
-                </div>
-                {fromCurrency !== "KRW" && toCurrency !== "KRW" && <div className="text-xs text-gray-400 mt-2">* 원화(KRW)를 통한 교차 환율로 계산됨</div>}
+            {rates.length > 0 && (
+              <div className="text-xs text-gray-500 text-center">
+                현재 환율 기준: {rates[0].date}
               </div>
             )}
           </div>
@@ -250,3 +349,6 @@ export default function ExchangeRatesWidget() {
     </div>
   );
 }
+
+// React.memo로 컴포넌트를 감싸서 불필요한 리렌더링 방지
+export default memo(ExchangeRatesWidget);

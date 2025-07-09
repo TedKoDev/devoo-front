@@ -16,8 +16,34 @@ interface MarketData {
   출처: string;
 }
 
+interface ProcessedData {
+  gold: {
+    priceKRW: number;
+    priceUSD: number;
+    date: string;
+    change: number;
+    changePercent: number;
+  } | null;
+  oil: {
+    price: number;
+    date: string;
+    change: number;
+    changePercent: number;
+  } | null;
+  exchangeRate: {
+    rate: number;
+    change: number;
+    changePercent: number;
+  } | null;
+}
+
 function GoldOilWidget() {
   const [data, setData] = useState<MarketData[]>([]);
+  const [processedData, setProcessedData] = useState<ProcessedData>({
+    gold: null,
+    oil: null,
+    exchangeRate: null
+  });
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [goldAmount, setGoldAmount] = useState("");
@@ -35,8 +61,9 @@ function GoldOilWidget() {
           const parsed = JSON.parse(cachedData);
           console.log('Using cached market data:', parsed);
           setData(parsed.data || []);
+          processMarketData(parsed.data || []);
           setIsLoading(false);
-          return; // 캐시된 데이터가 있으면 API 호출 생략
+          return;
         } catch (e) {
           console.log('Cache parse error, fetching fresh data');
         }
@@ -81,6 +108,7 @@ function GoldOilWidget() {
           console.log('Parsed market data:', marketData);
           
           setData(marketData);
+          processMarketData(marketData);
           
           // localStorage에 저장
           localStorage.setItem(cacheKey, JSON.stringify({
@@ -98,30 +126,122 @@ function GoldOilWidget() {
       }
     };
 
-    // 컴포넌트 마운트 시 한 번만 실행
     fetchMarketData();
-  }, []); // 빈 배열로 마운트 시에만 실행
+  }, []);
+
+  const processMarketData = (marketData: MarketData[]) => {
+    // 날짜별로 데이터 그룹화
+    const dataByDate = marketData.reduce((acc, curr) => {
+      if (!acc[curr.날짜]) {
+        acc[curr.날짜] = {};
+      }
+      acc[curr.날짜][curr.항목] = curr;
+      return acc;
+    }, {} as Record<string, Record<string, MarketData>>);
+
+    // 날짜 정렬 (최신순)
+    const sortedDates = Object.keys(dataByDate).sort().reverse();
+    const latestDate = sortedDates[0];
+    const previousDate = sortedDates[1];
+
+    const latestData = dataByDate[latestDate] || {};
+    const previousData = dataByDate[previousDate] || {};
+
+    // 금 데이터 처리
+    let processedGold = null;
+    const goldData = latestData["금"];
+    const prevGoldData = previousData["금"];
+    const exchangeData = latestData["USD/KRW"];
+    const prevExchangeData = previousData["USD/KRW"];
+
+    const exchangeRate = exchangeData ? parseFloat(exchangeData.가격) : null;
+    const prevExchangeRate = prevExchangeData ? parseFloat(prevExchangeData.가격) : null;
+    
+    if (goldData && exchangeRate) {
+      const goldPriceUSD = parseFloat(goldData.가격);
+      const goldPriceKRW = (goldPriceUSD * exchangeRate) / 31.1035;
+      
+      let change = 0;
+      let changePercent = 0;
+      
+      if (prevGoldData && prevExchangeRate) {
+        const prevGoldPriceUSD = parseFloat(prevGoldData.가격);
+        const prevGoldPriceKRW = (prevGoldPriceUSD * prevExchangeRate) / 31.1035;
+        change = goldPriceKRW - prevGoldPriceKRW;
+        changePercent = (change / prevGoldPriceKRW) * 100;
+      }
+      
+      processedGold = {
+        priceKRW: Math.round(goldPriceKRW),
+        priceUSD: goldPriceUSD,
+        date: goldData.날짜,
+        change: Math.round(change),
+        changePercent: changePercent
+      };
+    }
+
+    // WTI 유가 처리
+    let processedOil = null;
+    const oilData = latestData["WTI"];
+    const prevOilData = previousData["WTI"];
+    
+    if (oilData) {
+      const oilPrice = parseFloat(oilData.가격);
+      
+      if (oilPrice >= 20 && oilPrice <= 200) {
+        let change = 0;
+        let changePercent = 0;
+        
+        if (prevOilData) {
+          const prevOilPrice = parseFloat(prevOilData.가격);
+          if (prevOilPrice >= 20 && prevOilPrice <= 200) {
+            change = oilPrice - prevOilPrice;
+            changePercent = (change / prevOilPrice) * 100;
+          }
+        }
+        
+        processedOil = {
+          price: oilPrice,
+          date: oilData.날짜,
+          change: change,
+          changePercent: changePercent
+        };
+      }
+    }
+
+    // 환율 처리
+    let processedExchangeRate = null;
+    if (exchangeRate) {
+      let change = 0;
+      let changePercent = 0;
+      
+      if (prevExchangeRate) {
+        change = exchangeRate - prevExchangeRate;
+        changePercent = (change / prevExchangeRate) * 100;
+      }
+      
+      processedExchangeRate = {
+        rate: exchangeRate,
+        change: change,
+        changePercent: changePercent
+      };
+    }
+
+    setProcessedData({
+      gold: processedGold,
+      oil: processedOil,
+      exchangeRate: processedExchangeRate
+    });
+  };
 
   if (isLoading) return <div className="widget-card">Loading...</div>;
   if (error) return <div className="widget-card">Error: {error}</div>;
 
-  // 최신 날짜의 금, 유가 데이터 추출
-  const latestData = data.reduce((acc, curr) => {
-    if (!acc[curr.항목] || curr.날짜 > acc[curr.항목].날짜) {
-      acc[curr.항목] = curr;
-    }
-    return acc;
-  }, {} as Record<string, MarketData>);
-
-  const gold = latestData["금"];
-  const oil = latestData["WTI"];
-
   // 금 계산기 함수
   const handleGoldCalculation = () => {
     const amount = parseFloat(goldAmount);
-    if (!isNaN(amount) && gold) {
-      const price = parseFloat(gold.가격);
-      const calculated = (amount * price).toLocaleString();
+    if (!isNaN(amount) && processedData.gold) {
+      const calculated = (amount * processedData.gold.priceKRW).toLocaleString();
       setGoldValue(calculated);
     }
   };
@@ -147,22 +267,62 @@ function GoldOilWidget() {
             {/* 금 시세 */}
             <div>
               <div className="text-sm text-gray-500 mb-1">금</div>
-              <div className="text-lg font-bold">
-                {parseFloat(gold?.가격 || "0").toLocaleString()} {gold?.단위}
-              </div>
-              {gold && <PriceChangeIndicator change={0} changePercent={0} />}
-              <div className="text-xs text-gray-400 mt-1">업데이트: {gold?.날짜}</div>
+              {processedData.gold ? (
+                <>
+                  <div className="text-lg font-bold">
+                    {processedData.gold.priceKRW.toLocaleString()} 원/g
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    ${processedData.gold.priceUSD.toLocaleString()} USD/oz
+                  </div>
+                  <PriceChangeIndicator 
+                    change={processedData.gold.change} 
+                    changePercent={processedData.gold.changePercent} 
+                  />
+                  <div className="text-xs text-gray-400 mt-1">업데이트: {processedData.gold.date}</div>
+                </>
+              ) : (
+                <div className="text-sm text-gray-500">데이터 없음</div>
+              )}
             </div>
 
             {/* 유가 시세 */}
             <div>
-              <div className="text-sm text-gray-500 mb-1">WTI(유가)</div>
-              <div className="text-lg font-bold">
-                {parseFloat(oil?.가격 || "0").toLocaleString()} {oil?.단위}
-              </div>
-              {oil && <PriceChangeIndicator change={0} changePercent={0} />}
-              <div className="text-xs text-gray-400 mt-1">업데이트: {oil?.날짜}</div>
+              <div className="text-sm text-gray-500 mb-1">WTI 원유</div>
+              {processedData.oil ? (
+                <>
+                  <div className="text-lg font-bold">
+                    ${processedData.oil.price.toLocaleString()} USD/barrel
+                  </div>
+                  {processedData.exchangeRate && (
+                    <div className="text-sm text-gray-600">
+                      {Math.round(processedData.oil.price * processedData.exchangeRate.rate).toLocaleString()} 원/barrel
+                    </div>
+                  )}
+                  <PriceChangeIndicator 
+                    change={processedData.oil.change} 
+                    changePercent={processedData.oil.changePercent} 
+                  />
+                  <div className="text-xs text-gray-400 mt-1">업데이트: {processedData.oil.date}</div>
+                </>
+              ) : (
+                <div className="text-sm text-gray-500">데이터 없음</div>
+              )}
             </div>
+
+            {/* 환율 정보 */}
+            {processedData.exchangeRate && (
+              <div>
+                <div className="text-sm text-gray-500 mb-1">USD/KRW 환율</div>
+                <div className="text-lg font-bold">
+                  {processedData.exchangeRate.rate.toLocaleString()} 원
+                </div>
+                <PriceChangeIndicator 
+                  change={processedData.exchangeRate.change} 
+                  changePercent={processedData.exchangeRate.changePercent} 
+                />
+              </div>
+            )}
           </div>
         </TabsContent>
 
@@ -170,7 +330,12 @@ function GoldOilWidget() {
           <div className="space-y-3">
             <div className="space-y-2">
               <label className="text-sm">금 (g)</label>
-              <Input type="number" value={goldAmount} onChange={(e) => setGoldAmount(e.target.value)} placeholder="금 무게 (g)" />
+              <Input 
+                type="number" 
+                value={goldAmount} 
+                onChange={(e) => setGoldAmount(e.target.value)} 
+                placeholder="금 무게 (g)" 
+              />
             </div>
             <div className="space-y-2">
               <label className="text-sm">원화 (₩)</label>
@@ -179,7 +344,11 @@ function GoldOilWidget() {
             <Button onClick={handleGoldCalculation} className="w-full">
               계산하기
             </Button>
-            {gold && <div className="text-xs text-gray-500">현재 금 시세: {parseFloat(gold.가격).toLocaleString()}원/g</div>}
+            {processedData.gold && (
+              <div className="text-xs text-gray-500">
+                현재 금 시세: {processedData.gold.priceKRW.toLocaleString()}원/g
+              </div>
+            )}
           </div>
         </TabsContent>
       </Tabs>

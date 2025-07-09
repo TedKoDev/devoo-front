@@ -18,10 +18,19 @@ interface MarketData {
   출처: string;
 }
 
+interface ProcessedRate {
+  currency: string;
+  krwRate: number;
+  date: string;
+  change: number;
+  changePercent: number;
+}
+
 const SUPPORTED_CURRENCIES = ["USD", "EUR", "JPY", "CNY", "RUB"];
 
 function ExchangeRatesWidget() {
   const [data, setData] = useState<MarketData[]>([]);
+  const [rates, setRates] = useState<ProcessedRate[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,8 +51,9 @@ function ExchangeRatesWidget() {
           const parsed = JSON.parse(cachedData);
           console.log('Using cached market data for exchange rates:', parsed);
           setData(parsed.data || []);
+          processExchangeData(parsed.data || []);
           setIsLoading(false);
-          return; // 캐시된 데이터가 있으면 API 호출 생략
+          return;
         } catch (e) {
           console.log('Cache parse error, fetching fresh data');
         }
@@ -88,6 +98,7 @@ function ExchangeRatesWidget() {
           console.log('Parsed market data for exchange rates:', marketData);
           
           setData(marketData);
+          processExchangeData(marketData);
           
           // localStorage에 저장
           localStorage.setItem(cacheKey, JSON.stringify({
@@ -105,57 +116,89 @@ function ExchangeRatesWidget() {
       }
     };
 
-    // 컴포넌트 마운트 시 한 번만 실행
     fetchMarketData();
-  }, []); // 빈 배열로 마운트 시에만 실행
+  }, []);
+
+  const processExchangeData = (marketData: MarketData[]) => {
+    // 날짜별로 데이터 그룹화
+    const dataByDate = marketData.reduce((acc, curr) => {
+      if (!acc[curr.날짜]) {
+        acc[curr.날짜] = {};
+      }
+      acc[curr.날짜][curr.항목] = curr;
+      return acc;
+    }, {} as Record<string, Record<string, MarketData>>);
+
+    // 날짜 정렬 (최신순)
+    const sortedDates = Object.keys(dataByDate).sort().reverse();
+    const latestDate = sortedDates[0];
+    const previousDate = sortedDates[1];
+
+    const latestData = dataByDate[latestDate] || {};
+    const previousData = dataByDate[previousDate] || {};
+
+    // 환율 데이터 추출 및 KRW 기준으로 변환
+    const processedRates = SUPPORTED_CURRENCIES.map((currency) => {
+      let currentRow, prevRow;
+      
+      if (currency === "USD") {
+        currentRow = latestData["USD/KRW"];
+        prevRow = previousData["USD/KRW"];
+      } else {
+        currentRow = latestData[`USD/${currency}`];
+        prevRow = previousData[`USD/${currency}`];
+      }
+
+      if (!currentRow) {
+        console.log(`Missing current data for currency: ${currency}`);
+        return null;
+      }
+
+      const baseRate = parseFloat(currentRow.가격);
+      let krwRate, prevKrwRate;
+
+      if (currency === "USD") {
+        krwRate = baseRate;
+        prevKrwRate = prevRow ? parseFloat(prevRow.가격) : baseRate;
+      } else {
+        const usdKrwRow = latestData["USD/KRW"];
+        const prevUsdKrwRow = previousData["USD/KRW"];
+        
+        if (!usdKrwRow) {
+          console.log("Missing USD/KRW rate");
+          return null;
+        }
+        
+        const usdKrwRate = parseFloat(usdKrwRow.가격);
+        krwRate = usdKrwRate / baseRate;
+        
+        if (prevRow && prevUsdKrwRow) {
+          const prevBaseRate = parseFloat(prevRow.가격);
+          const prevUsdKrwRate = parseFloat(prevUsdKrwRow.가격);
+          prevKrwRate = prevUsdKrwRate / prevBaseRate;
+        } else {
+          prevKrwRate = krwRate;
+        }
+      }
+
+      // 변화량 계산
+      const change = krwRate - prevKrwRate;
+      const changePercent = prevKrwRate !== 0 ? (change / prevKrwRate) * 100 : 0;
+
+      return {
+        currency,
+        krwRate,
+        date: currentRow.날짜,
+        change: Math.round(change * 100) / 100, // 소수점 2자리까지
+        changePercent: changePercent,
+      };
+    }).filter((rate): rate is NonNullable<typeof rate> => rate !== null);
+
+    setRates(processedRates);
+  };
 
   if (isLoading) return <div className="widget-card">Loading...</div>;
   if (error) return <div className="widget-card">Error: {error}</div>;
-
-  // 최신 날짜의 환율 데이터 추출
-  const latestData = data.reduce((acc, curr) => {
-    if (!acc[curr.항목] || curr.날짜 > acc[curr.항목].날짜) {
-      acc[curr.항목] = curr;
-    }
-    return acc;
-  }, {} as Record<string, MarketData>);
-
-  // 환율 데이터 추출 및 KRW 기준으로 변환
-  const rates = SUPPORTED_CURRENCIES.map((currency) => {
-    let row;
-    if (currency === "USD") {
-      row = latestData["USD/KRW"];
-    } else {
-      row = latestData[`USD/${currency}`];
-    }
-
-    if (!row) {
-      console.log(`Missing data for currency: ${currency}`);
-      return null;
-    }
-
-    const baseRate = parseFloat(row.가격);
-    let krwRate;
-
-    if (currency === "USD") {
-      krwRate = baseRate;
-    } else {
-      const usdKrwRate = latestData["USD/KRW"];
-      if (!usdKrwRate) {
-        console.log("Missing USD/KRW rate");
-        return null;
-      }
-      krwRate = parseFloat(usdKrwRate.가격) / baseRate;
-    }
-
-    return {
-      currency,
-      krwRate,
-      date: row.날짜,
-      change: 0, // 변화량 데이터가 없으므로 0으로 설정
-      changePercent: 0, // 변화율 데이터가 없으므로 0으로 설정
-    };
-  }).filter((rate): rate is NonNullable<typeof rate> => rate !== null);
 
   const calculateConversion = () => {
     const amount = parseFloat(fromAmount.replace(/,/g, ""));
@@ -184,6 +227,9 @@ function ExchangeRatesWidget() {
         const converted = krwAmount / toRate.krwRate;
         setResult(converted.toFixed(2));
       }
+    } else if (fromCurrency === "KRW" && toCurrency === "KRW") {
+      // KRW -> KRW
+      setResult(amount.toFixed(2));
     }
   };
 
@@ -197,7 +243,7 @@ function ExchangeRatesWidget() {
   const PriceChangeIndicator = ({ change = 0, changePercent = 0 }) => (
     <div className={`flex items-center text-sm ${change >= 0 ? "text-red-500" : "text-blue-500"}`}>
       {change >= 0 ? <ArrowUp className="h-3 w-3 mr-1" /> : <ArrowDown className="h-3 w-3 mr-1" />}
-      <span>{Math.abs(change).toLocaleString()}</span>
+      <span>{Math.abs(change).toFixed(2)}</span>
       <span className="ml-1">({Math.abs(changePercent).toFixed(2)}%)</span>
     </div>
   );
@@ -258,7 +304,7 @@ function ExchangeRatesWidget() {
                   <div className="text-sm text-gray-500">
                     {getCurrencySymbol(rate.currency)} {getCurrencyName(rate.currency)}
                   </div>
-                  <PriceChangeIndicator change={rate.change || 0} changePercent={rate.changePercent || 0} />
+                  <PriceChangeIndicator change={rate.change} changePercent={rate.changePercent} />
                 </div>
                 <div className="text-base font-bold mt-1">
                   1 {rate.currency} = {rate.krwRate.toLocaleString()}원

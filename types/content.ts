@@ -5,6 +5,7 @@ export enum TargetTypes {
   HOT_ISSUE = "HOT_ISSUE",
   SIDE_HUSTLE = "SIDE_HUSTLE",
   TOOL = "TOOL",
+  TOOL_REQUEST = "TOOL_REQUEST",
   COMMENT = "COMMENT",
 }
 
@@ -143,6 +144,7 @@ export interface ToolRequest {
   votes: number;
   status: "requested" | "in_progress" | "completed";
   date: string;
+  comments: number;
 }
 
 export interface CreateInteractionDto {

@@ -21,7 +21,8 @@ export async function fetchHotIssues(): Promise<HotIssue[]> {
         },
         {
           id: "3",
-          title: "주식 투자 초보자를 위한 기초 가이드: 시작하기 전 알아야 할 것들",
+          title:
+            "주식 투자 초보자를 위한 기초 가이드: 시작하기 전 알아야 할 것들",
           date: "2023-05-13",
           thumbnail: "/placeholder.svg?height=100&width=100",
           tags: ["투자", "주식"],
@@ -163,10 +164,12 @@ export interface ToolRequest {
   id: string;
   name: string;
   description: string;
+  content?: string; // 에디터로 작성한 상세 내용
   votes: number;
   status: "requested" | "in_progress" | "completed";
   requestedBy: string;
   requestedAt: string;
+  comments: number;
 }
 
 export async function fetchToolRequests(): Promise<ToolRequest[]> {
@@ -177,29 +180,61 @@ export async function fetchToolRequests(): Promise<ToolRequest[]> {
           id: "1",
           name: "AI 코드 리뷰 도구",
           description: "코드를 자동으로 리뷰하고 개선점을 제안하는 도구",
+          content: `<h2>AI 코드 리뷰 도구 상세 설명</h2>
+          <p>이 도구는 다음과 같은 기능을 제공합니다:</p>
+          <ul>
+            <li>자동 코드 분석 및 버그 탐지</li>
+            <li>코딩 스타일 및 컨벤션 검사</li>
+            <li>성능 최적화 제안</li>
+            <li>보안 취약점 스캔</li>
+          </ul>
+          <h3>기대 효과</h3>
+          <p>개발 시간 단축과 코드 품질 향상을 통해 전체적인 생산성을 높일 수 있습니다.</p>`,
           votes: 156,
           status: "requested",
           requestedBy: "user123",
           requestedAt: "2023-05-01",
+          comments: 23,
         },
         {
           id: "2",
           name: "주식 포트폴리오 분석기",
           description: "주식 포트폴리오의 위험도와 수익률을 분석하는 도구",
+          content: `<h2>주식 포트폴리오 분석기</h2>
+          <p>투자자들을 위한 종합적인 포트폴리오 분석 도구입니다.</p>
+          <h3>주요 기능</h3>
+          <ul>
+            <li>포트폴리오 위험도 분석</li>
+            <li>수익률 예측 모델링</li>
+            <li>섹터별 비중 분석</li>
+            <li>리밸런싱 제안</li>
+          </ul>
+          <blockquote>현재 개발 진행률: 70%</blockquote>`,
           votes: 98,
           status: "in_progress",
           requestedBy: "investor99",
           requestedAt: "2023-05-05",
+          comments: 15,
         },
         {
           id: "3",
           name: "프리랜서 계약서 생성기",
           description: "프리랜서 개발자를 위한 계약서 템플릿 생성 도구",
+          content: `<h2>프리랜서 계약서 생성기</h2>
+          <p>✅ <strong>개발 완료!</strong> 이제 사용할 수 있습니다.</p>
+          <h3>제공 기능</h3>
+          <ul>
+            <li>다양한 계약서 템플릿</li>
+            <li>자동 조항 생성</li>
+            <li>법적 검토 체크리스트</li>
+            <li>PDF 다운로드</li>
+          </ul>
+          <p>프리랜서 개발자들이 안전하고 전문적인 계약을 체결할 수 있도록 도와줍니다.</p>`,
           votes: 87,
           status: "completed",
           requestedBy: "freelancer42",
           requestedAt: "2023-04-20",
-          completedAt: "2023-05-10",
+          comments: 31,
         },
       ]);
     }, 800);
